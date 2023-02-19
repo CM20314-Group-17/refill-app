@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Refill</string>
+
+    <!-- Search -->
+    <string name="search_input">Search Products</string>
+    <string name="search_placeholder">Search Products</string>
+    <string name="search_back">Back</string>
+
+    <!-- Categories -->
+    <string name="categories_title">Categories</string>
+    <string name="categories_search">Search</string>
+    <string name="categories_add">Add</string>
+    <string name="categories_settings">Settings</string>
 </resources>
