@@ -20,7 +20,13 @@ import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
 import uk.ac.bath.cm20314.refill.ui.common.SearchModal
 
-/** Displays a list of product categories. */
+/**
+ *  Displays a list of product categories. Clicking on a product category will navigate to the
+ *  category screen. The user can also search for products and navigate to the settings screen.
+ *
+ *  @param navigateToCategory the function that navigates to the category screen.
+ *  @param navigateToSettings the function that navigates to the settings screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriesScreen(
@@ -28,9 +34,11 @@ fun CategoriesScreen(
     navigateToSettings: () -> Unit,
     categoriesViewModel: CategoriesViewModel = viewModel()
 ) {
-    val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var searchOpen by rememberSaveable { mutableStateOf(false) }
+    val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
+    // The Scaffold arranges the top app bar and floating action button.
+    // It is currently in the experimental material 3 API, which requires the '@OptIn' annotation.
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
@@ -52,17 +60,23 @@ fun CategoriesScreen(
             }
         }
     ) { padding ->
-        val categories by categoriesViewModel.categories.collectAsState()
 
+        // Display the list of categories from the view model.
+        // 'collectAsState' will cause the UI to automatically update when the data changes.
+        val categories by categoriesViewModel.categories.collectAsState()
         RefillList(
             items = categories,
             modifier = Modifier.padding(padding)
         ) { category ->
+
+            // Display each category in a card containing its name and the number of items.
+            // Each card navigates to the category screen when the user clicks it.
             RefillCard(
                 title = category.name,
                 label = if (category.itemCount == 1) "1 item" else "${category.itemCount} items",
                 onClick = { navigateToCategory(category.id) },
                 preview = {
+                    // TODO: Update the preview to show an image instead of a block colour.
                     Box(
                         modifier = Modifier
                             .height(100.dp)
@@ -83,7 +97,7 @@ fun CategoriesScreen(
         onActiveChange = { searchOpen = it },
         onQueryChange = categoriesViewModel::updateSearchResults
     ) {
-        // ...
+        // TODO: Add list of search results.
     }
 }
 
