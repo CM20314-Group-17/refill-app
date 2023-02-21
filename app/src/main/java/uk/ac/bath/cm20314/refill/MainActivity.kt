@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
+import com.google.firebase.database.DatabaseReference
 import uk.ac.bath.cm20314.refill.ui.RefillApp
 
 /** Provides a screen to display the app's user interface. */
