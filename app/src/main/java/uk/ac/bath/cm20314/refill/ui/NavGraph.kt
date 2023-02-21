@@ -65,7 +65,7 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             // TODO: Add product screen.
         }
         composable(route = "settings") {
-            // TODO: Add settings screen.
+            SettingsScreen(navigateBack = { navController.popBackStack() })
         }
     }
 }
