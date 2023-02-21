@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "460894894451",
+    "firebase_url": "https://refill-it-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "refill-it",
+    "storage_bucket": "refill-it.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460894894451:android:1bb280cc6ce6011b8ead06",
+        "android_client_info": {
+          "package_name": "uk.ac.bath.cm20314.refill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "460894894451-vr75agv7o27a5fn1669si1daqcd81tre.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7TKRV0mbCQroixCTO9NkpYY8pFpUcpq0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "460894894451-vr75agv7o27a5fn1669si1daqcd81tre.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
