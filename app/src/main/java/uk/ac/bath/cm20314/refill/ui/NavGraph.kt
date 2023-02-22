@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import uk.ac.bath.cm20314.refill.ui.categories.CategoriesScreen
-import uk.ac.bath.cm20314.refill.ui.settings.SettingsScreen
+import uk.ac.bath.cm20314.refill.ui.category.CategoryScreen
 
 /** Defines the app's screens and displays the current screen. */
 @Composable
@@ -49,7 +49,9 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             arguments = listOf(navArgument(name = "categoryId") { type = NavType.StringType })
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId")!!
-            // ...
+            CategoryScreen(
+                categoryId = categoryId,
+                navigateToProduct = navigateToProduct)
         }
         composable(
             route = "product/{productId}",

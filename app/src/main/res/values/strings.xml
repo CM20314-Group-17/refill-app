@@ -11,4 +11,10 @@
     <string name="categories_search">Search</string>
     <string name="categories_add">Add</string>
     <string name="categories_settings">Settings</string>
+
+    <!-- Categories -->
+    <string name="category_title">Categories</string>
+    <string name="category_search">Search</string>
+    <string name="category_add">Add</string>
+    <string name="category_settings">Settings</string>
 </resources>
