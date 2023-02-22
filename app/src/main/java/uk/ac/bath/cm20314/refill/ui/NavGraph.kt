@@ -13,6 +13,8 @@ import uk.ac.bath.cm20314.refill.ui.category.CategoryScreen
 /** Defines the app's screens and displays the current screen. */
 @Composable
 fun NavGraph(navController: NavHostController = rememberNavController()) {
+    // Lambda functions that navigate to each screen.
+    // Some screens require arguments, such as the id of the record to retrieve from the database.
     val navigateToCategories = {
         navController.navigate(route = "categories") {
             launchSingleTop = true
@@ -34,10 +36,14 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         }
     }
 
+    // The NavHost displays the current screen based on the navController.
+    // See https://developer.android.com/jetpack/compose/navigation.
     NavHost(
         navController = navController,
         startDestination = "categories",
     ) {
+        // Each 'composable' is a separate screen.
+        // The route is used to navigate to each screen, similar to a URL.
         composable(route = "categories") {
             CategoriesScreen(
                 navigateToCategory = navigateToCategory,
@@ -58,10 +64,10 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             arguments = listOf(navArgument(name = "productId") { type = NavType.StringType })
         ) { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId")!!
-            // ...
+            // TODO: Add product screen.
         }
         composable(route = "settings") {
-            // ...
+            SettingsScreen(navigateBack = { navController.popBackStack() })
         }
     }
 }

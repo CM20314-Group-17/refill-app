@@ -13,7 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
-/** Displays items in a responsive list. */
+/**
+ *  Displays items in a responsive list. Adjusts the number of columns based on the screen width.
+ *
+ *  @param items the items that the list displays.
+ *  @param itemContent the content for each list item.
+ */
 @Composable
 fun <T> RefillList(
     items: List<T>,
@@ -33,7 +38,14 @@ fun <T> RefillList(
     }
 }
 
-/** Clickable card containing a title, label and preview image. */
+/**
+ * A clickable card containing a title, label and preview image.
+ *
+ * @param title the title text in the card.
+ * @param label the label text underneath the title.
+ * @param onClick the function called when the user clicks the card.
+ * @param preview the content displayed above the title, such as a preview image.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefillCard(

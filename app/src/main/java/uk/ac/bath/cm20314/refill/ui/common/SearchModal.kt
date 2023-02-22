@@ -26,7 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import uk.ac.bath.cm20314.refill.R
 
-/** Fullscreen model with search bar and area to display search results. */
+/**
+ * A fullscreen model with search bar and area to display search results.
+ *
+ * @param active whether the search modal is open.
+ * @param query the search query to display in the search bar.
+ * @param placeholder the placeholder text to display if the search bar is empty.
+ * @param onActiveChange a callback for when the search bar should open or close.
+ * @param onQueryChange a callback for when the user inputs text into the search bar.
+ * @param content the content to display in the search results area.
+ */
 @Composable
 fun SearchModal(
     active: Boolean,
@@ -76,6 +85,8 @@ fun SearchModal(
                 content()
             }
         }
+
+        // Close the search bar when the user presses the back button.
         BackHandler {
             onActiveChange(false)
         }
@@ -113,11 +124,9 @@ private fun SearchInput(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusRequester = remember { FocusRequester() }
-
     Box(modifier = modifier.fillMaxWidth()) {
-        val textStyle = TextStyle(MaterialTheme.colorScheme.onSurface)
         val label = stringResource(R.string.search_input)
+        val focusRequester = remember { FocusRequester() }
 
         BasicTextField(
             value = query,
@@ -126,19 +135,23 @@ private fun SearchInput(
             modifier = Modifier
                 .focusRequester(focusRequester)
                 .semantics { contentDescription = label },
-            textStyle = textStyle + MaterialTheme.typography.bodyLarge,
+            textStyle = TextStyle(MaterialTheme.colorScheme.onSurface) + MaterialTheme.typography.bodyLarge,
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
         )
 
+        // Display the placeholder text underneath the search input.
+        // The placeholder disappears if the user has inputted any text.
         if (query.isEmpty()) {
             Text(
                 text = placeholder,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        // Automatically open the keyboard.
+        // Only run when the search input enters the screen.
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
     }
 }
