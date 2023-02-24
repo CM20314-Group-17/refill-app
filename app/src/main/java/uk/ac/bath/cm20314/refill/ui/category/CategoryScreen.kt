@@ -18,7 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
-import uk.ac.bath.cm20314.refill.ui.common.SearchModal
+import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 
 /** Displays a list of products within a category. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,7 +76,7 @@ fun CategoryScreen(
 
 //    val searchText by categoryViewModel.searchText.collectAsState()
 //
-//    SearchModal(
+//    SearchDialog(
 //        active = searchOpen,
 //        query = searchText,
 //        placeholder = stringResource(R.string.search_placeholder),

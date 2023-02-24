@@ -13,10 +13,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.ac.bath.cm20314.refill.R
-import uk.ac.bath.cm20314.refill.ui.common.SearchModal
+import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 
 @RunWith(AndroidJUnit4::class)
-class SearchModalTest {
+class SearchDialogTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -27,18 +27,18 @@ class SearchModalTest {
             var open by remember { mutableStateOf(true) }
             var text by remember { mutableStateOf("") }
 
-            SearchModal(
+            SearchDialog(
                 active = open,
                 query = text,
                 placeholder = "placeholder",
-                onActiveChange = { open = it },
+                onClose = { open = false },
                 onQueryChange = { text = it },
                 content = {}
             )
         }
     }
 
-    /** Checks that the search bar closes. */
+    /** Checks that the search dialog closes. */
     @Test
     fun testClose() {
         composeTestRule
@@ -47,7 +47,7 @@ class SearchModalTest {
         composeTestRule.onNodeWithText(text = "placeholder").assertDoesNotExist()
     }
 
-    /** Checks that search bar automatically focuses. */
+    /** Checks that search input automatically focuses. */
     @Test
     fun testFocused() {
         composeTestRule
@@ -55,7 +55,7 @@ class SearchModalTest {
             .assertIsFocused()
     }
 
-    /** Checks that the search bar responds to text input. */
+    /** Checks that the search input responds to text input. */
     @Test
     fun testSearchInput() {
         val label = composeTestRule.activity.getString(R.string.search_input)

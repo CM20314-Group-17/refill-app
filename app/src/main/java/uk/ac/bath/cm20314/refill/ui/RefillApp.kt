@@ -1,19 +1,22 @@
 package uk.ac.bath.cm20314.refill.ui
 
 import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.map
 import uk.ac.bath.cm20314.refill.ui.theme.RefillTheme
 
-// Create the data store to save preferences.
-// See https://developer.android.com/topic/libraries/architecture/datastore.
 val Context.dataStore by preferencesDataStore(name = "preferences")
 
 /** Contains the app's entire user interface. */
@@ -29,6 +32,39 @@ fun RefillApp() {
             // The NavGraph contains the app's screens.
             // It swaps the current screen when the user navigates.
             NavGraph()
+        }
+    }
+}
+
+/** Arranges the top bar and floating action buttons. */
+@ExperimentalMaterial3Api
+@Composable
+fun RefillLayout(
+    topBar: @Composable (TopAppBarScrollBehavior) -> Unit,
+    actions: @Composable (ColumnScope.() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
+    val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
+        topBar = {
+            topBar(scrollBehaviour)
+        },
+        floatingActionButton = {
+            if (actions != null) {
+                Column(
+                    modifier = if (isLandscape) Modifier.navigationBarsPadding() else Modifier,
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    content = actions,
+                )
+            }
+        },
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            content()
         }
     }
 }

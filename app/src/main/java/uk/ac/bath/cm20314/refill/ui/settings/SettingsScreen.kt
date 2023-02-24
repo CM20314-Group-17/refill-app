@@ -1,7 +1,9 @@
 package uk.ac.bath.cm20314.refill.ui.settings
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -19,49 +21,35 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
+import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.dataStore
 import uk.ac.bath.cm20314.refill.ui.rememberDarkTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navigateBack: () -> Unit) {
-    val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
-        topBar = {
-            SettingsTopBar(
-                navigateBack = navigateBack,
-                scrollBehaviour = scrollBehaviour
+    RefillLayout(
+        topBar = { scrollBehaviour ->
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(R.string.settings_title))
+                },
+                navigationIcon = {
+                    IconButton(onClick = navigateBack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.settings_back)
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehaviour
             )
         }
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
+    ) {
+        Column {
             ThemeSelection()
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SettingsTopBar(
-    navigateBack: () -> Unit,
-    scrollBehaviour: TopAppBarScrollBehavior
-) {
-    TopAppBar(
-        title = {
-            Text(text = stringResource(R.string.settings_title))
-        },
-        navigationIcon = {
-            IconButton(onClick = navigateBack) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.settings_back)
-                )
-            }
-        },
-        scrollBehavior = scrollBehaviour
-    )
 }
 
 @Composable
