@@ -26,7 +26,7 @@ import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 fun CategoryScreen(
     categoryId: String,
     navigateToProduct: (productId: String) -> Unit,
-    categoryViewModel: CategoryViewModel = viewModel()
+    categoryViewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory)
 ) {
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 //  var searchOpen by rememberSaveable { mutableStateOf(false) }
@@ -60,7 +60,7 @@ fun CategoryScreen(
         ) { product ->
             RefillCard(
                 title = product.name,
-                label = "${product.price_per_kg}p / 100g",
+                label = "${product.pricePerKg}p / 100g",
                 onClick = { navigateToProduct(product.id) },
                 preview = {
                     Box(

@@ -20,22 +20,17 @@ import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
 import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 
-/**
- *  Displays a list of product categories. Clicking on a product category will navigate to the
- *  category screen. The user can also search for products and navigate to the settings screen.
- *
- *  @param navigateToCategory the function that navigates to the category screen.
- *  @param navigateToSettings the function that navigates to the settings screen.
- */
+/** Displays a list of product categories. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriesScreen(
-    navigateToCategory: (categoryId: String) -> Unit,
+    navigateToCategory: (String) -> Unit,
     navigateToSettings: () -> Unit,
-    categoriesViewModel: CategoriesViewModel = viewModel()
+    categoriesViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
     var searchOpen by rememberSaveable { mutableStateOf(false) }
     val searchText by categoriesViewModel.searchText.collectAsState()
+    val categories by categoriesViewModel.categories.collectAsState()
 
     RefillLayout(
         topBar = { scrollBehaviour ->
@@ -49,7 +44,7 @@ fun CategoriesScreen(
             )
         },
         actions = {
-            FloatingActionButton(onClick = {  }) {
+            FloatingActionButton(onClick = { /*TODO*/ }) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.categories_add)
@@ -57,8 +52,6 @@ fun CategoriesScreen(
             }
         }
     ) {
-        val categories by categoriesViewModel.categories.collectAsState()
-
         RefillList(items = categories) { category ->
             RefillCard(
                 title = category.name,

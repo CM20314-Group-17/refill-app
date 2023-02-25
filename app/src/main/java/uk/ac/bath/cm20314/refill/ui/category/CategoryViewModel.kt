@@ -1,29 +1,35 @@
 package uk.ac.bath.cm20314.refill.ui.category
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import uk.ac.bath.cm20314.refill.data.Category
-import uk.ac.bath.cm20314.refill.data.Product
+import kotlinx.coroutines.launch
+import uk.ac.bath.cm20314.refill.data.product.Product
+import uk.ac.bath.cm20314.refill.data.product.ProductRepository
+import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
 
-class CategoryViewModel : ViewModel() {
+class CategoryViewModel(
+    private val repository: ProductRepository
+) : ViewModel() {
 
-    private val _products = MutableStateFlow(testProducts)
-    private val _searchText = MutableStateFlow("")
+    private val _products = MutableStateFlow(listOf<Product>())
 
     val products = _products.asStateFlow()
-    val searchText = _searchText.asStateFlow()
 
-    fun updateSearchResults(search: String) {
-        _searchText.value = search
+    init {
+        viewModelScope.launch {
+            _products.value = repository.getProducts("test")
+        }
+    }
+
+    companion object {
+        val Factory = viewModelFactory {
+            initializer {
+                CategoryViewModel(ProductRepositoryImpl)
+            }
+        }
     }
 }
-
-// Create dummy product class in data folder
-private val testProducts = listOf(
-    Product(id = "test", name = "Spaghetti", price_per_kg = 9, portion_size = 100f),
-    Product(id = "test", name = "Pennette (White)", price_per_kg = 8, portion_size = 100f),
-    Product(id = "test", name = "Pennette (Wholeweat)", price_per_kg = 9, portion_size = 100f),
-    Product(id = "test", name = "Tagliatelle", price_per_kg = 5, portion_size = 100f),
-    Product(id = "test", name = "Vermicelli Noodles", price_per_kg = 4, portion_size = 100f)
-)

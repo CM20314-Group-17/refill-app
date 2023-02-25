@@ -1,27 +1,41 @@
 package uk.ac.bath.cm20314.refill.ui.categories
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import uk.ac.bath.cm20314.refill.data.Category
+import kotlinx.coroutines.launch
+import uk.ac.bath.cm20314.refill.data.category.Category
+import uk.ac.bath.cm20314.refill.data.category.CategoryRepository
+import uk.ac.bath.cm20314.refill.data.category.CategoryRepositoryImpl
 
-class CategoriesViewModel : ViewModel() {
+class CategoriesViewModel(
+    private val repository: CategoryRepository
+) : ViewModel() {
 
-    private val _categories = MutableStateFlow(testCategories)
+    private val _categories = MutableStateFlow(listOf<Category>())
     private val _searchText = MutableStateFlow("")
 
     val categories = _categories.asStateFlow()
     val searchText = _searchText.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            _categories.value = repository.getCategories()
+        }
+    }
+
     fun updateSearchResults(search: String) {
         _searchText.value = search
     }
-}
 
-private val testCategories = listOf(
-    Category(id = "test", name = "Dried Fruits", itemCount = 9),
-    Category(id = "test", name = "Pasta", itemCount = 8),
-    Category(id = "test", name = "Nuts & Seeds", itemCount = 9),
-    Category(id = "test", name = "Rice", itemCount = 5),
-    Category(id = "test", name = "Beans", itemCount = 4)
-)
+    companion object {
+        val Factory = viewModelFactory {
+            initializer {
+                CategoriesViewModel(CategoryRepositoryImpl)
+            }
+        }
+    }
+}
