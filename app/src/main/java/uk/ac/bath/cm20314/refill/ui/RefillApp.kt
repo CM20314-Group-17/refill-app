@@ -12,12 +12,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.map
-import uk.ac.bath.cm20314.refill.ui.common.LocalSnackbarState
-import uk.ac.bath.cm20314.refill.ui.common.rememberSnackbarState
 import uk.ac.bath.cm20314.refill.ui.theme.RefillTheme
 
 val Context.dataStore by preferencesDataStore(name = "preferences")
@@ -26,22 +23,10 @@ val Context.dataStore by preferencesDataStore(name = "preferences")
 @Composable
 fun RefillApp() {
     val darkTheme by rememberDarkTheme()
-    val snackbarState = rememberSnackbarState()
 
     RefillTheme(darkTheme = darkTheme ?: isSystemInDarkTheme()) {
         Surface {
-            Box {
-                CompositionLocalProvider(LocalSnackbarState provides snackbarState) {
-                    NavGraph()
-                }
-                SnackbarHost(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .navigationBarsPadding()
-                        .zIndex(1f),
-                    hostState = snackbarState.hostState
-                )
-            }
+            NavGraph()
         }
     }
 }
@@ -52,6 +37,7 @@ fun RefillApp() {
 fun RefillLayout(
     topBar: @Composable (TopAppBarScrollBehavior) -> Unit,
     actions: @Composable (ColumnScope.() -> Unit)? = null,
+    snackbarHostState: SnackbarHostState? = null,
     content: @Composable () -> Unit
 ) {
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -72,6 +58,11 @@ fun RefillLayout(
                 )
             }
         },
+        snackbarHost = {
+            if (snackbarHostState != null) {
+                SnackbarHost(hostState = snackbarHostState)
+            }
+        }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             content()

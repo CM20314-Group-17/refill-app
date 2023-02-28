@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepository
@@ -15,20 +17,41 @@ class CategoriesViewModel(
     private val repository: CategoryRepository
 ) : ViewModel() {
 
-    private val _categories = MutableStateFlow(listOf<Category>())
-    private val _searchText = MutableStateFlow("")
+    enum class Event {
+        CategoryCreated
+    }
+    private val _events = Channel<Event>()
+    val events = _events.receiveAsFlow()
 
+    private val _categories = MutableStateFlow(emptyList<Category>())
     val categories = _categories.asStateFlow()
-    val searchText = _searchText.asStateFlow()
 
-    init {
+    private var createdCategory: Category? = null
+
+    /** Loads categories from the repository. */
+    fun loadCategories() {
         viewModelScope.launch {
             _categories.value = repository.getCategories()
         }
     }
 
-    fun updateSearchResults(search: String) {
-        _searchText.value = search
+    /** Creates a new category with a particular name. */
+    fun createCategory(name: String) {
+        viewModelScope.launch {
+            createdCategory = repository.createCategory(name)
+            loadCategories()
+            _events.send(Event.CategoryCreated)
+        }
+    }
+
+    /** Deletes the previously created category. */
+    fun undoCreateCategory() {
+        viewModelScope.launch {
+            createdCategory?.let { category ->
+                repository.deleteCategory(category.id)
+                loadCategories()
+            }
+        }
     }
 
     companion object {

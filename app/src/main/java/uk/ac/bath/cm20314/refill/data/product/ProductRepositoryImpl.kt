@@ -24,4 +24,8 @@ object ProductRepositoryImpl : ProductRepository {
     override suspend fun createProduct(name: String, pricePerKg: Int, portionSize: Float): Product {
         TODO()
     }
+
+    override suspend fun deleteProduct(productId: String) {
+        TODO()
+    }
 }

@@ -11,6 +11,10 @@
     <string name="categories_search">Search</string>
     <string name="categories_add">Add</string>
     <string name="categories_settings">Settings</string>
+    <plurals name="categories_items">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -20,7 +24,18 @@
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_theme_system">System Default</string>
 
-    <!-- Categories -->
+    <!-- Discard dialog -->
+    <string name="discard_message">Discard draft?</string>
+    <string name="discard_confirm">Discard</string>
+    <string name="discard_cancel">Cancel</string>
+
+    <!-- Category -->
+    <string name="category_new">New Category</string>
+    <string name="category_edit">Edit Category</string>
+    <string name="category_save">Save</string>
+    <string name="category_name">Name</string>
+    <string name="category_close">Close</string>
+
     <string name="category_title">Categories</string>
     <string name="category_search">Search</string>
     <string name="category_add">Add</string>

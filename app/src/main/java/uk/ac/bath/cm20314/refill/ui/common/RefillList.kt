@@ -27,7 +27,7 @@ fun <T> RefillList(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 250.dp),
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)

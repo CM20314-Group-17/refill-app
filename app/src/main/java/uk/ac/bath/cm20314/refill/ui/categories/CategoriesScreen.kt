@@ -9,11 +9,16 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
@@ -21,42 +26,65 @@ import uk.ac.bath.cm20314.refill.ui.common.RefillList
 import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 
 /** Displays a list of product categories. */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CategoriesScreen(
-    navigateToCategory: (String) -> Unit,
+    navigateToCategory: (categoryId: String) -> Unit,
     navigateToSettings: () -> Unit,
-    categoriesViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
+    viewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
-    var searchOpen by rememberSaveable { mutableStateOf(false) }
-    val searchText by categoriesViewModel.searchText.collectAsState()
-    val categories by categoriesViewModel.categories.collectAsState()
+    var searchDialogOpen by rememberSaveable { mutableStateOf(value = false) }
+    var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
+    var searchText by rememberSaveable { mutableStateOf(value = "") }
+    val categories by viewModel.categories.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadCategories()
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                CategoriesViewModel.Event.CategoryCreated -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = "Category created",
+                        actionLabel = "Undo",
+                        duration = SnackbarDuration.Short
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.undoCreateCategory()
+                    }
+                }
+            }
+        }
+    }
 
     RefillLayout(
         topBar = { scrollBehaviour ->
             CategoriesTopBar(
                 navigateToSearch = {
-                    categoriesViewModel.updateSearchResults(search = "")
-                    searchOpen = true
+                    searchText = ""
+                    searchDialogOpen = true
                 },
                 navigateToSettings = navigateToSettings,
                 scrollBehaviour = scrollBehaviour
             )
         },
         actions = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(onClick = { createDialogOpen = true }) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.categories_add)
                 )
             }
-        }
+        },
+        snackbarHostState = snackbarHostState
     ) {
         RefillList(items = categories) { category ->
+            val count = category.itemCount
+
             RefillCard(
                 title = category.name,
-                label = if (category.itemCount == 1) "1 item" else "${category.itemCount} items",
-                onClick = { navigateToCategory(category.id) },
+                label = pluralStringResource(R.plurals.categories_items, count, count),
+                onClick = { navigateToCategory(category.id) }
             ) {
                 // TODO: Display image rather than a block colour.
                 Box(
@@ -70,13 +98,20 @@ fun CategoriesScreen(
     }
 
     SearchDialog(
-        active = searchOpen,
+        active = searchDialogOpen,
         query = searchText,
         placeholder = stringResource(R.string.search_placeholder),
-        onClose = { searchOpen = false },
-        onQueryChange = categoriesViewModel::updateSearchResults
+        onClose = { searchDialogOpen = false },
+        onQueryChange = { searchText = it }
     ) {
         // TODO: Add search results.
+    }
+
+    if (createDialogOpen) {
+        CreateCategoryDialog(
+            createCategory = viewModel::createCategory,
+            onClose = { createDialogOpen = false }
+        )
     }
 }
 
@@ -88,9 +123,7 @@ private fun CategoriesTopBar(
     scrollBehaviour: TopAppBarScrollBehavior
 ) {
     CenterAlignedTopAppBar(
-        title = {
-            Text(text = stringResource(R.string.categories_title))
-        },
+        title = { Text(text = stringResource(R.string.categories_title)) },
         navigationIcon = {
             IconButton(onClick = navigateToSearch) {
                 Icon(
@@ -111,11 +144,63 @@ private fun CategoriesTopBar(
     )
 }
 
-@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesScreenPreview() {
-    CategoriesScreen(
-        navigateToCategory = {},
-        navigateToSettings = {}
+fun CreateCategoryDialog(
+    createCategory: (name: String) -> Unit,
+    onClose: () -> Unit,
+) {
+    var categoryName by rememberSaveable { mutableStateOf(value = "") }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        awaitFrame()
+        focusRequester.requestFocus()
+    }
+
+    AlertDialog(
+        title = { Text(text = stringResource(R.string.category_new)) },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    createCategory(categoryName)
+                    onClose()
+                    categoryName = ""
+                }
+            ) {
+                Text(text = "Save")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onClose()
+                    categoryName = ""
+                }
+            ) {
+                Text(text = "Cancel")
+            }
+        },
+        text = {
+            Column {
+                Text(
+                    text = "Create a new product category.",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                OutlinedTextField(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .focusRequester(focusRequester),
+                    label = { Text(text = stringResource(R.string.category_name)) },
+                    value = categoryName,
+                    onValueChange = { categoryName = it },
+                    singleLine = true
+                )
+            }
+        },
+        onDismissRequest = {
+            onClose()
+            categoryName = ""
+        }
     )
 }

@@ -13,4 +13,7 @@ interface CategoryRepository {
 
     /** Creates a new category. */
     suspend fun createCategory(name: String): Category
+
+    /** Deletes an existing category. */
+    suspend fun deleteCategory(categoryId: String)
 }

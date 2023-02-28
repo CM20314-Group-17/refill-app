@@ -24,4 +24,8 @@ object CategoryRepositoryImpl : CategoryRepository {
     override suspend fun createCategory(name: String): Category {
         TODO()
     }
+
+    override suspend fun deleteCategory(categoryId: String) {
+
+    }
 }
