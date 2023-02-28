@@ -12,9 +12,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.map
+import uk.ac.bath.cm20314.refill.ui.common.LocalSnackbarState
+import uk.ac.bath.cm20314.refill.ui.common.rememberSnackbarState
 import uk.ac.bath.cm20314.refill.ui.theme.RefillTheme
 
 val Context.dataStore by preferencesDataStore(name = "preferences")
@@ -23,15 +26,22 @@ val Context.dataStore by preferencesDataStore(name = "preferences")
 @Composable
 fun RefillApp() {
     val darkTheme by rememberDarkTheme()
+    val snackbarState = rememberSnackbarState()
 
-    // Display the user interface in the correct theme.
-    // If the user has not selected a theme, it will use the system default.
     RefillTheme(darkTheme = darkTheme ?: isSystemInDarkTheme()) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-
-            // The NavGraph contains the app's screens.
-            // It swaps the current screen when the user navigates.
-            NavGraph()
+        Surface {
+            Box {
+                CompositionLocalProvider(LocalSnackbarState provides snackbarState) {
+                    NavGraph()
+                }
+                SnackbarHost(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .navigationBarsPadding()
+                        .zIndex(1f),
+                    hostState = snackbarState.hostState
+                )
+            }
         }
     }
 }
