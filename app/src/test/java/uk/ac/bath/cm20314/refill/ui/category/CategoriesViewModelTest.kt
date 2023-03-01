@@ -17,57 +17,47 @@ import uk.ac.bath.cm20314.refill.ui.categories.CategoriesViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class CategoriesViewModelTest {
 
+    private lateinit var repository: FakeCategoryRepository
+    private lateinit var viewModel: CategoriesViewModel
+
     @Before
-    fun setupCoroutines() {
+    fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        repository = FakeCategoryRepository()
+        viewModel = CategoriesViewModel(repository)
     }
 
     @Test
     fun testLoadCategories() = runTest {
-        val repository = FakeCategoryRepository()
-        val viewModel = CategoriesViewModel(repository)
-
         viewModel.loadCategories()
         assertArrayEquals(repository.data.toTypedArray(), viewModel.categories.value.toTypedArray())
     }
 
     @Test
     fun testCreateCategory() = runTest {
-        val repository = FakeCategoryRepository()
-        val viewModel = CategoriesViewModel(repository)
-
-        viewModel.createCategory("category4")
-        assertEquals("category4", repository.data.last().name)
+        viewModel.createCategory("Category 4")
+        assertEquals("Category 4", repository.data.last().name)
         assertEquals(CategoriesViewModel.Event.CategoryCreated, viewModel.events.first())
     }
 
     @Test
     fun testReloadCategoriesAfterCreate() = runTest {
-        val repository = FakeCategoryRepository()
-        val viewModel = CategoriesViewModel(repository)
-
-        viewModel.createCategory("category4")
+        viewModel.createCategory("Category 4")
         viewModel.events.first()
         assertArrayEquals(repository.data.toTypedArray(), viewModel.categories.value.toTypedArray())
     }
 
     @Test
     fun testUndoCreateCategory() = runTest {
-        val repository = FakeCategoryRepository()
-        val viewModel = CategoriesViewModel(repository)
-
-        viewModel.createCategory("category4")
+        viewModel.createCategory("Category 4")
         viewModel.events.first()
         viewModel.undoCreateCategory()
-        assertNull(repository.data.find { it.name == "category4" })
+        assertNull(repository.data.find { it.name == "Category 4" })
     }
 
     @Test
     fun testReloadCategoriesAfterUndo() = runTest {
-        val repository = FakeCategoryRepository()
-        val viewModel = CategoriesViewModel(repository)
-
-        viewModel.createCategory("category4")
+        viewModel.createCategory("Category 4")
         viewModel.events.first()
         viewModel.undoCreateCategory()
         assertArrayEquals(repository.data.toTypedArray(), viewModel.categories.value.toTypedArray())
