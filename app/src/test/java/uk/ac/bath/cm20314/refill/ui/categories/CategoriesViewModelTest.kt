@@ -1,18 +1,15 @@
-package uk.ac.bath.cm20314.refill.ui.category
+package uk.ac.bath.cm20314.refill.ui.categories
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import uk.ac.bath.cm20314.refill.data.category.FakeCategoryRepository
-import uk.ac.bath.cm20314.refill.ui.categories.CategoriesViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CategoriesViewModelTest {

@@ -26,7 +26,7 @@ class CategoriesViewModel(
     private val _categories = MutableStateFlow(emptyList<Category>())
     val categories = _categories.asStateFlow()
 
-    private var createdCategory: Category? = null
+    private var category: Category? = null
 
     /** Loads categories from the repository. */
     fun loadCategories() {
@@ -38,7 +38,7 @@ class CategoriesViewModel(
     /** Creates a new category with a particular name. */
     fun createCategory(name: String) {
         viewModelScope.launch {
-            createdCategory = repository.createCategory(name)
+            category = repository.createCategory(name)
             loadCategories()
             _events.send(Event.CategoryCreated)
         }
@@ -47,7 +47,7 @@ class CategoriesViewModel(
     /** Deletes the previously created category. */
     fun undoCreateCategory() {
         viewModelScope.launch {
-            createdCategory?.let { category ->
+            category?.let { category ->
                 repository.deleteCategory(category.id)
                 loadCategories()
             }

@@ -146,7 +146,7 @@ private fun CategoriesTopBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateCategoryDialog(
+private fun CreateCategoryDialog(
     createCategory: (name: String) -> Unit,
     onClose: () -> Unit,
 ) {
