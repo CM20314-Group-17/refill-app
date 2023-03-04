@@ -29,7 +29,7 @@ object ProductRepositoryImpl : ProductRepository {
             val portionSize = it.child("portionSize").value
             val pricePerKg = it.child("pricePerKg").value
             val updated = it.child("updated").value
-            Log.i("firebase","Got value $pricePerKg")//Test to see if database reads
+            Log.i("firebase","Got value $pricePerKg")//Test to see if database can read
         }
         return Product(id = "test", name = "Vermicelli Noodles", pricePerKg = 4, portionSize = 100f)
     }
