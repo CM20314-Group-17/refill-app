@@ -7,6 +7,9 @@ val LocalNfc = staticCompositionLocalOf<NfcRepository> { error("No NFC repositor
 
 interface NfcRepository {
 
-    /** Writes product information to the NFC tag and returns whether it was successful. */
-    suspend fun writeProductInformation(product: Product): Boolean
+    /** Checks whether the device supports NFC. */
+    fun isNfcSupported(): Boolean
+
+    /** Writes product information to the next NFC tag tapped on the device. */
+    suspend fun writeProductInformation(product: Product)
 }

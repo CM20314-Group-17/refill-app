@@ -1,7 +1,7 @@
 package uk.ac.bath.cm20314.refill
 
-import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
@@ -20,10 +20,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        nfcRepository = NfcRepositoryImpl(this, ProductRepositoryImpl)
+
         // Allow content to appear behind the status bar and navigation bar.
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        nfcRepository = NfcRepositoryImpl(this, ProductRepositoryImpl)
 
         // Display content on the screen using 'composable' functions.
         // Each composable function calls other composable functions to display UI elements.
@@ -34,21 +34,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        val action = intent?.action
-
-        // TODO: Only call NFC repository when the intent is NFC-related.
-        nfcRepository.onNewIntent(intent)
-    }
-
     override fun onResume() {
         super.onResume()
-        nfcRepository.enable()
+        nfcRepository.enableNfc()
     }
 
     override fun onPause() {
         super.onPause()
-        nfcRepository.disable()
+        nfcRepository.disableNfc()
     }
 }
