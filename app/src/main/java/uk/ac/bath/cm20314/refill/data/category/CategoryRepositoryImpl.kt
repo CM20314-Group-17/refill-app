@@ -1,6 +1,11 @@
 package uk.ac.bath.cm20314.refill.data.category
 
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+
+private lateinit var database: DatabaseReference
 object CategoryRepositoryImpl : CategoryRepository {
+
 
     override suspend fun getCategories(): List<Category> {
         // TODO: Replace with categories retrieved from the database.

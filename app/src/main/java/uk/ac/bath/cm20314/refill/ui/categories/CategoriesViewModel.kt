@@ -12,10 +12,11 @@ import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepository
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepositoryImpl
+import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
 
 class CategoriesViewModel(
     private val repository: CategoryRepository
-) : ViewModel() {
+    ) : ViewModel() {
 
     enum class Event {
         CategoryCreated
