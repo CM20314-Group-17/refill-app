@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
@@ -28,12 +30,17 @@ import uk.ac.bath.cm20314.refill.ui.common.RefillList
 fun CategoryScreen(
     categoryId: String,
     navigateToProduct: (productId: String) -> Unit,
+    navigateBack: () -> Unit,
     viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryId))
 ) {
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
+    var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
+
     val products by viewModel.products.collectAsState()
     val category by viewModel.category.collectAsState()
+
     val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
@@ -57,6 +64,7 @@ fun CategoryScreen(
             CategoryTopBar(
                 categoryName = category?.name ?: "",
                 editCategory = { editDialogOpen = true },
+                onDeleteCategory = { deleteDialogOpen = true },
                 scrollBehaviour = scrollBehaviour
             )
         },
@@ -93,6 +101,18 @@ fun CategoryScreen(
             onClose = { editDialogOpen = false }
         )
     }
+
+    if (deleteDialogOpen) {
+        DeleteCategoryDialog(
+            onDelete = {
+                coroutineScope.launch {
+                    viewModel.deleteCategory().join()
+                    navigateBack()
+                }
+            },
+            onClose = { deleteDialogOpen = false }
+        )
+    }
 }
 
 @ExperimentalMaterial3Api
@@ -100,8 +120,11 @@ fun CategoryScreen(
 private fun CategoryTopBar(
     categoryName: String,
     editCategory: () -> Unit,
+    onDeleteCategory: () -> Unit,
     scrollBehaviour: TopAppBarScrollBehavior
 ) {
+    var dropdownOpen by remember { mutableStateOf(false) }
+
     TopAppBar(
         title = { Text(text = categoryName) },
         actions = {
@@ -109,6 +132,24 @@ private fun CategoryTopBar(
                 Icon(
                     imageVector = Icons.Outlined.Edit,
                     contentDescription = stringResource(R.string.category_edit)
+                )
+            }
+            IconButton(onClick = { dropdownOpen = !dropdownOpen }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = null
+                )
+            }
+            DropdownMenu(
+                expanded = dropdownOpen,
+                onDismissRequest = { dropdownOpen = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(text = "Delete category") },
+                    onClick = {
+                        onDeleteCategory()
+                        dropdownOpen = false
+                    }
                 )
             }
         },
@@ -169,6 +210,33 @@ private fun EditCategoryDialog(
                     singleLine = true
                 )
             }
+        },
+        onDismissRequest = onClose
+    )
+}
+
+@Composable
+private fun DeleteCategoryDialog(
+    onDelete: () -> Unit,
+    onClose: () -> Unit
+) {
+    AlertDialog(
+        title = { Text(text = "Delete Category?") },
+        confirmButton = {
+            TextButton(onClick = onDelete) {
+                Text(text = "Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onClose) {
+                Text(text = "Cancel")
+            }
+        },
+        text = {
+            Text(
+                text = "Are you sure you want to the delete this category. This cannot be undone.",
+                style = MaterialTheme.typography.bodyLarge
+            )
         },
         onDismissRequest = onClose
     )

@@ -1,10 +1,10 @@
 package uk.ac.bath.cm20314.refill.ui.category
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -61,6 +61,10 @@ class CategoryViewModel(
             _category.value = category.value?.copy(name = previousName!!)
             _category.value?.let { categoryRepository.updateCategory(it) }
         }
+    }
+
+    fun deleteCategory() = viewModelScope.launch {
+        _category.value?.let { categoryRepository.deleteCategory(it.id) }
     }
 
     class Factory(private val categoryId: String) : ViewModelProvider.Factory {
