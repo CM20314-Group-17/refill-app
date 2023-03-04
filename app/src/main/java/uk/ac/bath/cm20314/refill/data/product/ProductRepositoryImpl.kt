@@ -1,23 +1,14 @@
 package uk.ac.bath.cm20314.refill.data.product
 
-import com.google.android.gms.common.api.Response
+import android.util.Log
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.tasks.await
+
+private lateinit var database: DatabaseReference
 
 object ProductRepositoryImpl : ProductRepository {
 
-    private val rootRef: DatabaseReference = FirebaseDatabase.getInstance().reference
-    private val productRef: DatabaseReference = rootRef.child("ProductRef")
 
-    data class Response(
-        var products: List<Product>? = null,
-        var exception: Exception? = null
-    )
-
-    interface FirebaseCallback {
-        fun onResponse(response: Response)
-    }
 
     override suspend fun getProducts(categoryId: String): List<Product> {
         // TODO: Replace with products retrieved from the database.
@@ -30,26 +21,17 @@ object ProductRepositoryImpl : ProductRepository {
         )
     }
 
-    fun getDBResponse(callback: FirebaseCallback) {
-        productRef.get().addOnCompleteListener {task ->
-            val response = Response()
-            if (task.isSuccessful) {
-                val result = task.result
-                result?.let {
-                    response.products = result.children.map {snapShot ->
-                        snapShot.getValue(Product::class.java)!!
-                    }
-                }
-            }
-            else {
-                response.exception = task.exception
-            }
-            callback.onResponse(response)
-        }
-    }
 
-    override suspend fun getProduct(productId: String): Product? {
-        TODO()
+    override suspend fun getProduct(productId: String, categoryId: String): Product? {//need category id too
+        database =FirebaseDatabase.getInstance().getReference("Categories")
+        database.child(categoryId).child(productId).child("0").get().addOnSuccessListener {
+            val name = it.child("name").value
+            val portionSize = it.child("portionSize").value
+            val pricePerKg = it.child("pricePerKg").value
+            val updated = it.child("updated").value
+            Log.i("firebase","Got value $pricePerKg")//Test to see if database reads
+        }
+        return Product(id = "test", name = "Vermicelli Noodles", pricePerKg = 4, portionSize = 100f)
     }
 
     override suspend fun updateProduct(product: Product) {

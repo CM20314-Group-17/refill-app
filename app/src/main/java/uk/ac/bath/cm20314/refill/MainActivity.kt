@@ -36,19 +36,11 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(LocalNfc provides nfcRepository) {
                 RefillApp()
             }
+
         }
 
-        viewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
-        callbackResponse()
     }
 
-    private fun callbackResponse() {
-        viewModel.callbackResponse(object: ProductRepositoryImpl.FirebaseCallback {
-            override fun onResponse(response: ProductRepositoryImpl.Response) {
-                print(response)
-            }
-        })
-    }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -68,19 +60,5 @@ class MainActivity : ComponentActivity() {
         nfcRepository.disable()
     }
 
-    private fun print(response: ProductRepositoryImpl.Response) {
-        response.products?.let { products ->
-            products.forEach { product ->
-                product.name?.let {
-                    Log.i(TAG, it)
-                }
-            }
-        }
 
-        response.exception?.let { exception ->
-            exception.message?.let {
-                Log.e(TAG, it)
-            }
-        }
-    }
 }

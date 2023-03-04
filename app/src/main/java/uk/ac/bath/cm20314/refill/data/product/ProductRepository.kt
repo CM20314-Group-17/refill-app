@@ -6,7 +6,7 @@ interface ProductRepository {
     suspend fun getProducts(categoryId: String): List<Product>
 
     /** Gets the product with a particular id. */
-    suspend fun getProduct(productId: String): Product?
+    suspend fun getProduct(productId: String, categoryId: String): Product?
 
     /** Updates an existing product. */
     suspend fun updateProduct(product: Product)
