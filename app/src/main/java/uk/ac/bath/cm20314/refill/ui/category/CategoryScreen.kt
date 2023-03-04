@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -196,10 +197,7 @@ private fun EditCategoryDialog(
         },
         text = {
             Column {
-                Text(
-                    text = "Rename the product category.",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Text(text = "Rename the product category.")
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(top = 16.dp)
@@ -221,7 +219,7 @@ private fun DeleteCategoryDialog(
     onClose: () -> Unit
 ) {
     AlertDialog(
-        title = { Text(text = "Delete Category?") },
+        title = { Text(text = "Permanently delete?") },
         confirmButton = {
             TextButton(onClick = onDelete) {
                 Text(text = "Delete")
@@ -232,10 +230,11 @@ private fun DeleteCategoryDialog(
                 Text(text = "Cancel")
             }
         },
-        text = {
-            Text(
-                text = "Are you sure you want to the delete this category. This cannot be undone.",
-                style = MaterialTheme.typography.bodyLarge
+        text = { Text(text = "Deleting this category will also remove all its products from the database.") },
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.Delete,
+                contentDescription = null
             )
         },
         onDismissRequest = onClose

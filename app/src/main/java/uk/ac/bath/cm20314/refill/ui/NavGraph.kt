@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import uk.ac.bath.cm20314.refill.ui.categories.CategoriesScreen
 import uk.ac.bath.cm20314.refill.ui.category.CategoryScreen
+import uk.ac.bath.cm20314.refill.ui.product.ProductScreen
 import uk.ac.bath.cm20314.refill.ui.settings.SettingsScreen
 
 /** Defines the app's screens and displays the current screen. */
@@ -57,8 +58,8 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         composable(
             route = "product/{productId}",
             arguments = listOf(navArgument(name = "productId") { type = NavType.StringType })
-        ) {
-            // TODO: Add product screen.
+        ) { backStackEntry ->
+            ProductScreen(productId = backStackEntry.arguments?.getString("productId")!!)
         }
         composable(route = "settings") {
             SettingsScreen(navigateBack = { navController.popBackStack() })

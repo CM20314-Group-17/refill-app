@@ -69,7 +69,6 @@ class NfcRepositoryImpl(
     override suspend fun writeProductInformation(product: Product) {
         if (!isNfcSupported()) {
             Toast.makeText(activity, "NFC is not enabled", Toast.LENGTH_LONG).show()
-            return
         }
 
         // TODO: create proper payload

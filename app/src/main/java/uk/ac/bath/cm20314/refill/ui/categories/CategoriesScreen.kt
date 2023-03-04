@@ -183,10 +183,7 @@ private fun CreateCategoryDialog(
         },
         text = {
             Column {
-                Text(
-                    text = "Create a new product category.",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Text(text = "Create a new product category.")
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(top = 16.dp)
