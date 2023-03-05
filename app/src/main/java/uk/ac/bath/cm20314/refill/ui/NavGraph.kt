@@ -59,7 +59,9 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             route = "product/{productId}",
             arguments = listOf(navArgument(name = "productId") { type = NavType.StringType })
         ) { backStackEntry ->
-            ProductScreen(productId = backStackEntry.arguments?.getString("productId")!!)
+            ProductScreen(
+                productId = backStackEntry.arguments?.getString("productId")!!,
+                navigateBack = { navController.popBackStack() })
         }
         composable(route = "settings") {
             SettingsScreen(navigateBack = { navController.popBackStack() })

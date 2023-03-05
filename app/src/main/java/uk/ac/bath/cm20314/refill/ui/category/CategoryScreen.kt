@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
@@ -66,6 +67,7 @@ fun CategoryScreen(
                 categoryName = category?.name ?: "",
                 editCategory = { editDialogOpen = true },
                 onDeleteCategory = { deleteDialogOpen = true },
+                navigateBack = navigateBack,
                 scrollBehaviour = scrollBehaviour
             )
         },
@@ -122,12 +124,20 @@ private fun CategoryTopBar(
     categoryName: String,
     editCategory: () -> Unit,
     onDeleteCategory: () -> Unit,
+    navigateBack: () -> Unit,
     scrollBehaviour: TopAppBarScrollBehavior
 ) {
     var dropdownOpen by remember { mutableStateOf(false) }
 
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = { Text(text = categoryName) },
+        navigationIcon = {
+            IconButton(onClick = {
+                navigateBack()
+            }) {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+            }
+        },
         actions = {
             IconButton(onClick = editCategory) {
                 Icon(

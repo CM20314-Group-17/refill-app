@@ -11,15 +11,17 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColourScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = DarkGreen,
+    secondary = Salmon,
+    tertiary = GreyGreen,
+    background = LightGrey,
 )
 
 private val DarkColourScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = GreyGreen,
+    secondary = Salmon,
+    tertiary = LightGrey,
+    background = DarkGreen,
 )
 
 /** Displays the content using the app's theme. */
