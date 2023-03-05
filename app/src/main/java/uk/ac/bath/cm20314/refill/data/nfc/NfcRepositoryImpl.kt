@@ -7,18 +7,10 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NdefFormatable
-import android.util.Log
 import android.widget.Toast
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ChannelResult
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.suspendCancellableCoroutine
 import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.data.product.ProductRepository
-import java.io.IOException
-import kotlin.coroutines.suspendCoroutine
 
 class NfcRepositoryImpl(
     private val activity: Activity,
@@ -26,7 +18,7 @@ class NfcRepositoryImpl(
 ) : NfcRepository {
 
     private val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(activity)
-    private var payload = Channel<String>()
+    private val messages = Channel<String>()
 
     /** Start listening for nearby NFC tags. */
     fun enableNfc() {
@@ -48,7 +40,7 @@ class NfcRepositoryImpl(
     }
 
     private fun onTagDiscovered(tag: Tag) {
-        val payload = payload.tryReceive().getOrNull() ?: return
+        val payload = messages.tryReceive().getOrNull() ?: return
         val message = NdefMessage(NdefRecord.createTextRecord("en", payload))
 
         Ndef.get(tag)?.use { ndef ->
@@ -71,8 +63,8 @@ class NfcRepositoryImpl(
             Toast.makeText(activity, "NFC is not enabled", Toast.LENGTH_LONG).show()
         }
 
-        // TODO: create proper payload
-        payload.send("test")
+        val nameCode = product.name.subSequence(0, 6).padEnd(6)
+        messages.send("${product.portionSize}_${product.pricePerKg}_${nameCode}")
         repository.updateProduct(product.copy(isUpdated = true))
     }
 }
