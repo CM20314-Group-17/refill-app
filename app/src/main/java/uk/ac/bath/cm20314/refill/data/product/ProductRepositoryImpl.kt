@@ -1,8 +1,8 @@
 package uk.ac.bath.cm20314.refill.data.product
 
+import android.content.ContentValues.TAG
 import android.util.Log
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 
 private lateinit var database: DatabaseReference
 
@@ -39,10 +39,29 @@ object ProductRepositoryImpl : ProductRepository {
     }
 
     override suspend fun createProduct(name: String, pricePerKg: Int, portionSize: Float): Product {
+        val database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("Category")//category needed here
+        val newItemRef = myRef.push()
+        newItemRef.setValue("hey")
         TODO()
     }
 
-    override suspend fun deleteProduct(productId: String) {
-        TODO()
+    override suspend fun deleteProduct(productId: String, categoryId: String) {
+        val database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("Categories")
+        val query = myRef.orderByKey().equalTo(categoryId)
+
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (categorySnapshot in dataSnapshot.children) {
+                    val itemQuery = categorySnapshot.child(productId).ref
+                    itemQuery.removeValue()
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e(TAG, "ERROR", databaseError.toException())
+            }
+        })
     }
 }
