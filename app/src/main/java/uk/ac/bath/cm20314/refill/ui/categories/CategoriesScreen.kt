@@ -24,7 +24,6 @@ import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
-import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 
 /** Displays a list of product categories. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -32,11 +31,10 @@ import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 fun CategoriesScreen(
     navigateToCategory: (Category) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToSearch: () -> Unit,
     viewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
-    var searchDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-    var searchText by rememberSaveable { mutableStateOf(value = "") }
     val categories by viewModel.categories.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -61,11 +59,8 @@ fun CategoriesScreen(
     RefillLayout(
         topBar = { scrollBehaviour ->
             CategoriesTopBar(
-                navigateToSearch = {
-                    searchText = ""
-                    searchDialogOpen = true
-                },
                 navigateToSettings = navigateToSettings,
+                navigateToSearch = navigateToSearch,
                 scrollBehaviour = scrollBehaviour
             )
         },
@@ -94,16 +89,6 @@ fun CategoriesScreen(
                 )
             }
         }
-    }
-
-    SearchDialog(
-        active = searchDialogOpen,
-        query = searchText,
-        placeholder = stringResource(R.string.search_placeholder),
-        onClose = { searchDialogOpen = false },
-        onQueryChange = { searchText = it }
-    ) {
-        // TODO: Add search results.
     }
 
     if (createDialogOpen) {

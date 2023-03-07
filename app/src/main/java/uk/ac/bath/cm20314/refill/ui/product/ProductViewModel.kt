@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.data.product.ProductRepository
+import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
 
 class ProductViewModel(
     categoryId: String,
@@ -64,6 +65,6 @@ class ProductViewModel(
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>) =
-            ProductViewModel(categoryId, productId, FakeProductRepository) as T
+            ProductViewModel(categoryId, productId, ProductRepositoryImpl) as T
     }
 }

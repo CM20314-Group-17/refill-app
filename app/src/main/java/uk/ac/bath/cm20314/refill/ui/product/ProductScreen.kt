@@ -51,6 +51,8 @@ fun ProductScreen(
     navigateBack: () -> Unit,
     viewModel: ProductViewModel = viewModel(factory = ProductViewModel.Factory(categoryId, productId))
 ) {
+    val product by viewModel.product.collectAsState()
+
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
 

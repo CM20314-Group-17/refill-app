@@ -12,6 +12,7 @@ import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.ui.categories.CategoriesScreen
 import uk.ac.bath.cm20314.refill.ui.category.CategoryScreen
 import uk.ac.bath.cm20314.refill.ui.product.ProductScreen
+import uk.ac.bath.cm20314.refill.ui.search.SearchScreen
 import uk.ac.bath.cm20314.refill.ui.settings.SettingsScreen
 
 /** Defines the app's screens and displays the current screen. */
@@ -77,6 +78,15 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = "settings") {
             SettingsScreen(navigateBack = { navController.popBackStack() })
+        }
+        composable(route = "search") {
+            SearchScreen(
+                navigateBack = { navController.popBackStack() },
+                navigateToProduct = {
+                    navController.popBackStack()
+                    navigateToProduct(it)
+                }
+            )
         }
     }
 }
