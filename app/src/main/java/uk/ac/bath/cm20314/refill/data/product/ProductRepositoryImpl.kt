@@ -38,12 +38,26 @@ object ProductRepositoryImpl : ProductRepository {
         TODO()
     }
 
-    override suspend fun createProduct(name: String, pricePerKg: Int, portionSize: Float): Product {
+    override suspend fun createProduct(categoryId:String,productId: String,name: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean) {
         val database = FirebaseDatabase.getInstance()
-        val myRef = database.getReference("Category")//category needed here
-        val newItemRef = myRef.push()
-        newItemRef.setValue("hey")
-        TODO()
+        val myRef = database.getReference("Categories")
+        val query = myRef.orderByKey().equalTo(categoryId)
+        val product = Product(productId, name, pricePerKg, portionSize, isUpdated)
+
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (categorySnapshot in dataSnapshot.children) {
+                    val newItemRef = categorySnapshot.child(name).ref
+                    newItemRef.setValue(product)
+                    Log.d(TAG, "Item added")
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e(TAG, "Error", databaseError.toException())
+            }
+        })
+
     }
 
     override suspend fun deleteProduct(productId: String, categoryId: String) {
