@@ -38,7 +38,7 @@ object ProductRepositoryImpl : ProductRepository {
         TODO()
     }
 
-    override suspend fun createProduct(categoryId:String,productId: String,name: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean) {
+    override suspend fun createProduct(categoryId:String,productId: String,name: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean):Product? {
         val database = FirebaseDatabase.getInstance()
         val myRef = database.getReference("Categories")
         val query = myRef.orderByKey().equalTo(categoryId)
@@ -57,7 +57,7 @@ object ProductRepositoryImpl : ProductRepository {
                 Log.e(TAG, "Error", databaseError.toException())
             }
         })
-
+        return product
     }
 
     override suspend fun deleteProduct(productId: String, categoryId: String) {
