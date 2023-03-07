@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
+import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
@@ -31,7 +32,7 @@ import uk.ac.bath.cm20314.refill.ui.common.RefillList
 @Composable
 fun CategoryScreen(
     categoryId: String,
-    navigateToProduct: (productId: String) -> Unit,
+    navigateToProduct: (Product) -> Unit,
     navigateBack: () -> Unit,
     viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryId))
 ) {
@@ -85,7 +86,7 @@ fun CategoryScreen(
             RefillCard(
                 title = product.name,
                 label = "${product.pricePerKg}p / 100g",
-                onClick = { navigateToProduct(product.id) },
+                onClick = { navigateToProduct(product) },
             ) {
                 // TODO: Display image rather than a block colour.
                 Box(

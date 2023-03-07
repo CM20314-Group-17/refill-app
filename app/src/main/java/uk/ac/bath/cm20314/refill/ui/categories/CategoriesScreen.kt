@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
+import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
@@ -29,7 +30,7 @@ import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CategoriesScreen(
-    navigateToCategory: (categoryId: String) -> Unit,
+    navigateToCategory: (Category) -> Unit,
     navigateToSettings: () -> Unit,
     viewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
@@ -79,12 +80,10 @@ fun CategoriesScreen(
         snackbarHostState = snackbarHostState
     ) {
         RefillList(items = categories) { category ->
-            val count = category.itemCount
-
             RefillCard(
                 title = category.name,
-                label = pluralStringResource(R.plurals.categories_items, count, count),
-                onClick = { navigateToCategory(category.id) }
+                label = pluralStringResource(R.plurals.categories_items, category.itemCount, category.itemCount),
+                onClick = { navigateToCategory(category) }
             ) {
                 // TODO: Display image rather than a block colour.
                 Box(

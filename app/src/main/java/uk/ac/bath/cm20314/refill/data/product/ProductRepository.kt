@@ -6,14 +6,14 @@ interface ProductRepository {
     suspend fun getProducts(categoryId: String): List<Product>
 
     /** Gets the product with a particular id. */
-    suspend fun getProduct(productId: String): Product?
+    suspend fun getProduct(categoryId: String, productId: String): Product?
 
     /** Updates an existing product. */
     suspend fun updateProduct(product: Product)
 
-    /** Creates a new product. */
-    suspend fun createProduct(name: String, pricePerKg: Int, portionSize: Float): Product
+    /** Creates a new product in a particular category. */
+    suspend fun createProduct(categoryId: String, name: String, pricePerKg: Int, portionSize: Float): Product
 
     /** Deletes an existing product. */
-    suspend fun deleteProduct(productId: String)
+    suspend fun deleteProduct(categoryId: String, productId: String)
 }

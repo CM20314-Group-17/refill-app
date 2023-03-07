@@ -48,7 +48,7 @@ class CategoriesViewModel(
     fun undoCreateCategory() {
         viewModelScope.launch {
             category?.let { category ->
-                repository.deleteCategory(category.id)
+                repository.deleteCategory(category.categoryId)
                 loadCategories()
             }
         }

@@ -46,9 +46,10 @@ import uk.ac.bath.cm20314.refill.ui.product.ProductViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(
+    categoryId: String,
     productId: String,
     navigateBack: () -> Unit,
-    viewModel: ProductViewModel = viewModel(factory = ProductViewModel.Factory(productId))
+    viewModel: ProductViewModel = viewModel(factory = ProductViewModel.Factory(categoryId, productId))
 ) {
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
@@ -63,7 +64,6 @@ fun ProductScreen(
     // Don't reuse the NFC coroutine scope since it may be cancelled.
     val nfcCoroutineScope = rememberCoroutineScope()
     val nfcRepository = LocalNfc.current
-    val product by viewModel.product.collectAsState()
     var nfcDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {

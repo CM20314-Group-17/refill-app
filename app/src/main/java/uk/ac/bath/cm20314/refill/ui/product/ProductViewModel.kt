@@ -11,10 +11,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.data.product.ProductRepository
-import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
-import uk.ac.bath.cm20314.refill.ui.category.CategoryViewModel
 
 class ProductViewModel(
+    categoryId: String,
     productId: String,
     private val productRepository: ProductRepository
 ) : ViewModel() {
@@ -32,7 +31,7 @@ class ProductViewModel(
 
     init {
         viewModelScope.launch {
-            _product.value = productRepository.getProduct(productId)
+            _product.value = productRepository.getProduct(categoryId, productId)
         }
     }
 
@@ -55,13 +54,16 @@ class ProductViewModel(
         }
     }
     fun deleteProduct() = viewModelScope.launch {
-        _product.value?.let { productRepository.deleteProduct(it.id) }
+        _product.value?.let { productRepository.deleteProduct(it.categoryId, it.productId) }
     }
 
-    class Factory(private val productId: String) : ViewModelProvider.Factory {
+    class Factory(
+        private val categoryId: String,
+        private val productId: String
+    ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>) =
-            ProductViewModel(productId, ProductRepositoryImpl) as T
+            ProductViewModel(categoryId, productId, FakeProductRepository) as T
     }
 }
