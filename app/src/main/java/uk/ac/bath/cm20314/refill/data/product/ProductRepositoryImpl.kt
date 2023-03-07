@@ -74,7 +74,7 @@ object ProductRepositoryImpl : ProductRepository {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.e(TAG, "ERROR", databaseError.toException())
+                Log.e(TAG, "Error", databaseError.toException())
             }
         })
     }
