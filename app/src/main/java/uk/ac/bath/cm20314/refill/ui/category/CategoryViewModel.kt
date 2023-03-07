@@ -49,8 +49,8 @@ class CategoryViewModel(
     fun updateCategory(name: String) {
         viewModelScope.launch {
             _category.update { category ->
-                previousName = category?.name
-                category?.copy(name = name) ?: category
+                previousName = category?.categoryName
+                category?.copy(categoryName = name) ?: category
             }
             _category.value?.let { categoryRepository.updateCategory(it) }
             _events.send(Event.CategoryUpdated)
@@ -60,7 +60,7 @@ class CategoryViewModel(
     fun undoUpdateCategory() {
         viewModelScope.launch {
             // TODO: Fix problem that the title doesn't update when undoing rename.
-            _category.value = category.value?.copy(name = previousName!!)
+            _category.value = category.value?.copy(categoryName = previousName!!)
             _category.value?.let { categoryRepository.updateCategory(it) }
         }
     }

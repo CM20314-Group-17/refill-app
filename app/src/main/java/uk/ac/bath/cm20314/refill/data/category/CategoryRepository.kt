@@ -6,14 +6,14 @@ interface CategoryRepository {
     suspend fun getCategories(): List<Category>
 
     /** Gets the category with a particular id. */
-    suspend fun getCategory(categoryId: String): Category?
+    suspend fun getCategory(categoryName: String): Category?
 
     /** Updates an existing category. */
     suspend fun updateCategory(category: Category)
 
     /** Creates a new category. */
-    suspend fun createCategory(name: String): Category
+    suspend fun createCategory(categoryName: String): Category
 
     /** Deletes an existing category. */
-    suspend fun deleteCategory(categoryId: String)
+    suspend fun deleteCategory(categoryName: String)
 }

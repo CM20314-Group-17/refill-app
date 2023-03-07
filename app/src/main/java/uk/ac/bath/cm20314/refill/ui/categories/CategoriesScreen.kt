@@ -82,7 +82,7 @@ fun CategoriesScreen(
             val count = category.itemCount
 
             RefillCard(
-                title = category.name,
+                title = category.categoryName,
                 label = pluralStringResource(R.plurals.categories_items, count, count),
                 onClick = { navigateToCategory(category.id) }
             ) {

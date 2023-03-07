@@ -55,7 +55,7 @@ fun CategoryScreen(
     RefillLayout(
         topBar = { scrollBehaviour ->
             CategoryTopBar(
-                categoryName = category?.name ?: "",
+                categoryName = category?.categoryName ?: "",
                 editCategory = { editDialogOpen = true },
                 scrollBehaviour = scrollBehaviour
             )
@@ -72,9 +72,9 @@ fun CategoryScreen(
     ) {
         RefillList(items = products) { product ->
             RefillCard(
-                title = product.name,
+                title = product.productName,//THIS USED TO SAY PRODUCT.NAME
                 label = "${product.pricePerKg}p / 100g",
-                onClick = { navigateToProduct(product.id) },
+                onClick = { navigateToProduct(product.productName) },//THIS USED TO SAY PRODUCT.ID IDK IF THIS IS RIGHT BUT I HAD TO TEST
             ) {
                 // TODO: Display image rather than a block colour.
                 Box(
