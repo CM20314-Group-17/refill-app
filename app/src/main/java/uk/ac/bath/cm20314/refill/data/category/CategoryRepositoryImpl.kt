@@ -1,7 +1,8 @@
 package uk.ac.bath.cm20314.refill.data.category
 
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import android.content.ContentValues
+import android.util.Log
+import com.google.firebase.database.*
 
 private lateinit var database: DatabaseReference
 object CategoryRepositoryImpl : CategoryRepository {
@@ -31,6 +32,20 @@ object CategoryRepositoryImpl : CategoryRepository {
     }
 
     override suspend fun deleteCategory(categoryId: String) {
+        val database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("Categories")
+        val query = myRef.orderByKey().equalTo(categoryId)
 
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (categorySnapshot in dataSnapshot.children) {
+                    categorySnapshot.ref.removeValue()
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e(ContentValues.TAG, "Error", databaseError.toException())
+            }
+        })
     }
-}
+    }

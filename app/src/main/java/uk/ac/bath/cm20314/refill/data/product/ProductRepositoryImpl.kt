@@ -35,7 +35,8 @@ object ProductRepositoryImpl : ProductRepository {
     }
 
     override suspend fun updateProduct(product: Product) {
-        TODO()
+        deleteProduct(product.name,"category")
+        createProduct("category",product.id,product.name,product.pricePerKg,product.portionSize,product.isUpdated)
     }
 
     override suspend fun createProduct(categoryId:String,productId: String,name: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean):Product? {
