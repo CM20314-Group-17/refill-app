@@ -12,7 +12,7 @@ interface ProductRepository {
     suspend fun updateProduct(product: Product)
 
     /** Creates a new product. */
-    suspend fun createProduct(name: String, pricePerKg: Int, portionSize: Float): Product
+    suspend fun createProduct(category: String, id: String, name: String, pricePerKg: Int, portionSize: Float): Product
 
     /** Deletes an existing product. */
     suspend fun deleteProduct(productId: String)

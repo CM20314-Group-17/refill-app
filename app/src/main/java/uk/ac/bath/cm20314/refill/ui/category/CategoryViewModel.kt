@@ -44,10 +44,6 @@ class CategoryViewModel(
         }
     }
 
-    fun callbackResponse(callback: ProductRepositoryImpl.FirebaseCallback) {
-        ProductRepositoryImpl.getDBResponse(callback)
-    }
-
     fun updateCategory(name: String) {
         viewModelScope.launch {
             _category.update { category ->
