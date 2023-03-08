@@ -65,7 +65,7 @@ fun SearchScreen(
             LazyColumn {
                 items(results) { product ->
                     ListItem(
-                        headlineText = { Text(text = product.name) },
+                        headlineText = { Text(text = product.productName) },
                         modifier = Modifier.clickable { navigateToProduct(product) }
                     )
                 }

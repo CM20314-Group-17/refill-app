@@ -24,7 +24,7 @@ class CategoryViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         categoryRepository = FakeCategoryRepository()
         productRepository = FakeProductRepository()
-        viewModel = CategoryViewModel(categoryId = "1", categoryRepository, productRepository)
+        viewModel = CategoryViewModel(categoryName = "Category 1", categoryRepository, productRepository)
     }
 
     @Test
@@ -39,9 +39,9 @@ class CategoryViewModelTest {
 
     @Test
     fun testUpdateCategory() = runTest {
-        viewModel.updateCategory("updated category")
-        assertEquals("updated category", categoryRepository.data[0].name)
-        assertEquals("updated category", viewModel.category.value?.name)
+        viewModel.updateCategory("Updated Category")
+        assertEquals("Updated Category", categoryRepository.data[0].categoryName)
+        assertEquals("Updated Category", viewModel.category.value?.categoryName)
         assertEquals(CategoryViewModel.Event.CategoryUpdated, viewModel.events.first())
     }
 
@@ -50,13 +50,13 @@ class CategoryViewModelTest {
         viewModel.updateCategory("updated category")
         viewModel.events.first()
         viewModel.undoUpdateCategory()
-        assertEquals("Category 1", categoryRepository.data[0].name)
-        assertEquals("Category 1", viewModel.category.value?.name)
+        assertEquals("Category 1", categoryRepository.data[0].categoryName)
+        assertEquals("Category 1", viewModel.category.value?.categoryName)
     }
 
     @Test
     fun testDeleteCategory() = runTest {
         viewModel.deleteCategory()
-        assertEquals("Category 2", categoryRepository.data[0].name)
+        assertEquals("Category 2", categoryRepository.data[0].categoryName)
     }
 }

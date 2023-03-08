@@ -1,43 +1,84 @@
 package uk.ac.bath.cm20314.refill.data.product
 
-import java.util.*
+import android.content.ContentValues.TAG
+import android.util.Log
+import com.google.firebase.database.*
+
+private lateinit var database: DatabaseReference
 
 object ProductRepositoryImpl : ProductRepository {
 
-    val data = mutableListOf(
-        Product(productId = "1", categoryId = "1", name = "Product 1", pricePerKg = 1, portionSize = 1f, isUpdated = true),
-        Product(productId = "2", categoryId = "1", name = "Product 2", pricePerKg = 2, portionSize = 2f, isUpdated = true),
-        Product(productId = "3", categoryId = "1", name = "Product 3", pricePerKg = 3, portionSize = 3f, isUpdated = true),
-        Product(productId = "4", categoryId = "2", name = "Product 4", pricePerKg = 4, portionSize = 4f, isUpdated = true),
-        Product(productId = "5", categoryId = "2", name = "Product 5", pricePerKg = 5, portionSize = 5f, isUpdated = true),
-        Product(productId = "6", categoryId = "2", name = "Product 6", pricePerKg = 6, portionSize = 6f, isUpdated = true),
-        Product(productId = "7", categoryId = "3", name = "Product 7", pricePerKg = 7, portionSize = 7f, isUpdated = true),
-        Product(productId = "8", categoryId = "3", name = "Product 8", pricePerKg = 8, portionSize = 8f, isUpdated = true),
-        Product(productId = "9", categoryId = "3", name = "Product 9", pricePerKg = 9, portionSize = 9f, isUpdated = true)
-    )
+
 
     override suspend fun getProducts(categoryId: String): List<Product> {
-        return data.filter { it.categoryId == categoryId }.map { it.copy() }
+        // TODO: Replace with products retrieved from the database.
+        return listOf(
+            Product(categoryName = "Pasta",productName = "Spaghetti", pricePerKg = 9, portionSize = 100f),
+            Product(categoryName = "Pasta",productName = "Pennette (White)", pricePerKg = 8, portionSize = 100f),
+            Product(categoryName = "Pasta",productName = "Pennette (Wholewheat)", pricePerKg = 9, portionSize = 100f),
+            Product(categoryName = "Pasta",productName = "Tagliatelle", pricePerKg = 5, portionSize = 100f),
+            Product(categoryName = "Pasta",productName = "Vermicelli Noodles", pricePerKg = 4, portionSize = 100f)
+        )
     }
 
-    override suspend fun getProduct(categoryId: String, productId: String): Product? {
-        return data.find { it.productId == productId }
+
+    override suspend fun getProduct(productName: String, categoryName: String): Product? {//need category id too
+        database =FirebaseDatabase.getInstance().getReference("Categories")
+        database.child(categoryName).child(productName).child("0").get().addOnSuccessListener {
+            val name = it.child("name").value
+            val portionSize = it.child("portionSize").value
+            val pricePerKg = it.child("pricePerKg").value
+            val updated = it.child("updated").value
+            Log.i("firebase","Got value $pricePerKg")//Test to see if database can read
+        }
+        return Product(categoryName = "Pasta",productName = "Vermicelli Noodles", pricePerKg = 4, portionSize = 100f)
     }
 
     override suspend fun updateProduct(product: Product) {
-        getProduct(product.categoryId, product.productId)?.apply {
-            name = product.name
-            pricePerKg = product.pricePerKg
-            portionSize = product.portionSize
-            isUpdated = product.isUpdated
-        }
+        deleteProduct(product.productName,product.categoryName)
+        createProduct(product.categoryName,product.productName,product.pricePerKg,product.portionSize,product.isUpdated)
     }
 
-    override suspend fun createProduct(categoryId: String, name: String, pricePerKg: Int, portionSize: Float): Product {
-        return Product(categoryId, UUID.randomUUID().toString(), name, pricePerKg, portionSize).also { data.add(it) }
+    override suspend fun createProduct(categoryName:String,productName: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean):Product? {
+        val database = FirebaseDatabase.getInstance()
+        val ref = database.getReference("Categories")
+        val query = ref.orderByKey().equalTo(categoryName)
+        val product = Product(categoryName,productName, pricePerKg, portionSize, isUpdated)
+
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (categorySnapshot in dataSnapshot.children) {
+                    val newRef = categorySnapshot.child(productName).ref
+                    val productValues = product.toMap().filterKeys { key -> key != "categoryName" }
+                    newRef.setValue(productValues)
+                    Log.d(TAG, "Item added")
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e(TAG, "Error", databaseError.toException())
+            }
+        })
+        return product
     }
 
-    override suspend fun deleteProduct(categoryId: String, productId: String) {
-        data.removeIf { it.categoryId == categoryId && it.productId == productId }
+
+    override suspend fun deleteProduct(productName: String, categoryName: String) {
+        val database = FirebaseDatabase.getInstance()
+        val ref = database.getReference("Categories")
+        val query = ref.orderByKey().equalTo(categoryName)
+
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (categorySnapshot in dataSnapshot.children) {
+                    val itemQuery = categorySnapshot.child(productName).ref
+                    itemQuery.removeValue()
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e(TAG, "Error", databaseError.toException())
+            }
+        })
     }
 }

@@ -22,12 +22,12 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
     // Lambda functions that navigate to each screen.
     // Some screens require arguments, such as the id of the record to retrieve from the database.
     val navigateToCategory = { category: Category ->
-        navController.navigate(route = "category/${category.categoryId}") {
+        navController.navigate(route = "category/${category.categoryName}") {
             launchSingleTop = true
         }
     }
     val navigateToProduct = { product: Product ->
-        navController.navigate(route = "product/${product.categoryId}/${product.productId}") {
+        navController.navigate(route = "product/${product.categoryName}/${product.productName}") {
             launchSingleTop = true
         }
     }
@@ -55,25 +55,25 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
         composable(
-            route = "category/{categoryId}",
-            arguments = listOf(navArgument(name = "categoryId") { type = NavType.StringType })
+            route = "category/{categoryName}",
+            arguments = listOf(navArgument(name = "categoryName") { type = NavType.StringType })
         ) { backStackEntry ->
             CategoryScreen(
-                categoryId = backStackEntry.arguments?.getString("categoryId")!!,
+                categoryName = backStackEntry.arguments?.getString("categoryName")!!,
                 navigateToProduct = navigateToProduct,
                 navigateBack = { navController.popBackStack() }
             )
         }
         composable(
-            route = "product/{categoryId}/{productId}",
+            route = "product/{categoryName}/{productName}",
             arguments = listOf(
-                navArgument(name = "categoryId") { type = NavType.StringType },
-                navArgument(name = "productId") { type = NavType.StringType }
+                navArgument(name = "categoryName") { type = NavType.StringType },
+                navArgument(name = "productName") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             ProductScreen(
-                categoryId = backStackEntry.arguments?.getString("categoryId")!!,
-                productId = backStackEntry.arguments?.getString("productId")!!,
+                categoryName = backStackEntry.arguments?.getString("categoryName")!!,
+                productName = backStackEntry.arguments?.getString("productName")!!,
                 navigateBack = { navController.popBackStack() })
         }
         composable(route = "settings") {
@@ -82,9 +82,9 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         composable(route = "search") {
             SearchScreen(
                 navigateBack = { navController.popBackStack() },
-                navigateToProduct = {
+                navigateToProduct = { product ->
                     navController.popBackStack()
-                    navigateToProduct(it)
+                    navigateToProduct(product)
                 }
             )
         }

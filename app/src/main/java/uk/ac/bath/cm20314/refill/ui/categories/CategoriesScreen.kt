@@ -76,7 +76,7 @@ fun CategoriesScreen(
     ) {
         RefillList(items = categories) { category ->
             RefillCard(
-                title = category.name,
+                title = category.categoryName,
                 label = pluralStringResource(R.plurals.categories_items, category.itemCount, category.itemCount),
                 onClick = { navigateToCategory(category) }
             ) {

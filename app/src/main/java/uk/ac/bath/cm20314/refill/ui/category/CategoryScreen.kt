@@ -31,10 +31,10 @@ import uk.ac.bath.cm20314.refill.ui.common.RefillList
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
-    categoryId: String,
+    categoryName: String,
     navigateToProduct: (Product) -> Unit,
     navigateBack: () -> Unit,
-    viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryId))
+    viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryName))
 ) {
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
@@ -65,7 +65,7 @@ fun CategoryScreen(
     RefillLayout(
         topBar = { scrollBehaviour ->
             CategoryTopBar(
-                categoryName = category?.name ?: "",
+                categoryName = category?.categoryName ?: "",
                 editCategory = { editDialogOpen = true },
                 onDeleteCategory = { deleteDialogOpen = true },
                 navigateBack = navigateBack,
@@ -84,9 +84,9 @@ fun CategoryScreen(
     ) {
         RefillList(items = products) { product ->
             RefillCard(
-                title = product.name,
+                title = product.productName,//THIS USED TO SAY PRODUCT.NAME
                 label = "${product.pricePerKg}p / 100g",
-                onClick = { navigateToProduct(product) },
+                onClick = { navigateToProduct(product) }
             ) {
                 // TODO: Display image rather than a block colour.
                 Box(

@@ -12,10 +12,12 @@ import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepository
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepositoryImpl
+import uk.ac.bath.cm20314.refill.data.category.defaultCategoryRepository
+import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
 
 class CategoriesViewModel(
     private val repository: CategoryRepository
-) : ViewModel() {
+    ) : ViewModel() {
 
     enum class Event {
         CategoryCreated
@@ -48,7 +50,7 @@ class CategoriesViewModel(
     fun undoCreateCategory() {
         viewModelScope.launch {
             category?.let { category ->
-                repository.deleteCategory(category.categoryId)
+                repository.deleteCategory(category.categoryName)
                 loadCategories()
             }
         }
@@ -57,7 +59,7 @@ class CategoriesViewModel(
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                CategoriesViewModel(CategoryRepositoryImpl)
+                CategoriesViewModel(defaultCategoryRepository)
             }
         }
     }
