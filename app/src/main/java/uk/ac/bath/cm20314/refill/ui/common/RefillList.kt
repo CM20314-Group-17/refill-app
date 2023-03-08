@@ -9,7 +9,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
@@ -25,15 +28,25 @@ fun <T> RefillList(
     modifier: Modifier = Modifier,
     itemContent: @Composable (T) -> Unit
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 250.dp),
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(items) { item ->
-            itemContent(item)
+    if (items.isNotEmpty()) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 250.dp),
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(items) { item ->
+                itemContent(item)
+            }
+        }
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text(
+                text = "Empty",
+                modifier = Modifier.align(Alignment.Center),
+                style = MaterialTheme.typography.bodyLarge + TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            )
         }
     }
 }

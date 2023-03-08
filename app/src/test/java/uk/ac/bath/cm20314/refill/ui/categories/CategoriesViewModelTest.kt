@@ -33,7 +33,7 @@ class CategoriesViewModelTest {
     @Test
     fun testCreateCategory() = runTest {
         viewModel.createCategory("Category 4")
-        assertEquals("Category 4", repository.data.last().name)
+        assertEquals("Category 4", repository.data.last().categoryName)
         assertEquals(CategoriesViewModel.Event.CategoryCreated, viewModel.events.first())
     }
 
@@ -49,7 +49,7 @@ class CategoriesViewModelTest {
         viewModel.createCategory("Category 4")
         viewModel.events.first()
         viewModel.undoCreateCategory()
-        assertNull(repository.data.find { it.name == "Category 4" })
+        assertNull(repository.data.find { it.categoryName == "Category 4" })
     }
 
     @Test

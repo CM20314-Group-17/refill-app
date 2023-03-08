@@ -2,7 +2,6 @@ package uk.ac.bath.cm20314.refill.data.category
 
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import uk.ac.bath.cm20314.refill.data.product.Product
 
 private lateinit var database: DatabaseReference
 object CategoryRepositoryImpl : CategoryRepository {
@@ -28,9 +27,7 @@ object CategoryRepositoryImpl : CategoryRepository {
     }
 
     override suspend fun createCategory(name: String): Category {
-        database = FirebaseDatabase.getInstance().getReference("Categories").child(name)
-        database.setValue(name)
-        return Category("2", "Nuts", 0, true)
+        TODO()
     }
 
     override suspend fun deleteCategory(categoryId: String) {

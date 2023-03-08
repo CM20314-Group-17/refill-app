@@ -7,27 +7,27 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import uk.ac.bath.cm20314.refill.data.category.Category
+import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.ui.categories.CategoriesScreen
 import uk.ac.bath.cm20314.refill.ui.category.CategoryScreen
+import uk.ac.bath.cm20314.refill.ui.product.ProductScreen
+import uk.ac.bath.cm20314.refill.ui.search.SearchScreen
 import uk.ac.bath.cm20314.refill.ui.settings.SettingsScreen
 
 /** Defines the app's screens and displays the current screen. */
 @Composable
 fun NavGraph(navController: NavHostController = rememberNavController()) {
+
     // Lambda functions that navigate to each screen.
     // Some screens require arguments, such as the id of the record to retrieve from the database.
-    val navigateToCategories = {
-        navController.navigate(route = "categories") {
+    val navigateToCategory = { category: Category ->
+        navController.navigate(route = "category/${category.categoryName}") {
             launchSingleTop = true
         }
     }
-    val navigateToCategory = { categoryId: String ->
-        navController.navigate(route = "category/$categoryId") {
-            launchSingleTop = true
-        }
-    }
-    val navigateToProduct = { productId: String ->
-        navController.navigate(route = "product/$productId") {
+    val navigateToProduct = { product: Product ->
+        navController.navigate(route = "product/${product.categoryName}/${product.productName}") {
             launchSingleTop = true
         }
     }
@@ -36,38 +36,57 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             launchSingleTop = true
         }
     }
+    val navigateToSearch = {
+        navController.navigate(route = "search") {
+            launchSingleTop = true
+        }
+    }
 
     // The NavHost displays the current screen based on the navController.
-    // See https://developer.android.com/jetpack/compose/navigation.
     NavHost(
         navController = navController,
-        startDestination = "categories",
+        startDestination = "categories"
     ) {
-        // Each 'composable' is a separate screen.
-        // The route is used to navigate to each screen, similar to a URL.
         composable(route = "categories") {
             CategoriesScreen(
                 navigateToCategory = navigateToCategory,
-                navigateToSettings = navigateToSettings
+                navigateToSettings = navigateToSettings,
+                navigateToSearch = navigateToSearch
             )
         }
         composable(
-            route = "category/{categoryId}",
-            arguments = listOf(navArgument(name = "categoryId") { type = NavType.StringType })
+            route = "category/{categoryName}",
+            arguments = listOf(navArgument(name = "categoryName") { type = NavType.StringType })
         ) { backStackEntry ->
             CategoryScreen(
-                categoryId = backStackEntry.arguments?.getString("categoryId")!!,
-                navigateToProduct = navigateToProduct
+                categoryName = backStackEntry.arguments?.getString("categoryName")!!,
+                navigateToProduct = navigateToProduct,
+                navigateBack = { navController.popBackStack() }
             )
         }
         composable(
-            route = "product/{productId}",
-            arguments = listOf(navArgument(name = "productId") { type = NavType.StringType })
-        ) {
-            // TODO: Add product screen.
+            route = "product/{categoryName}/{productName}",
+            arguments = listOf(
+                navArgument(name = "categoryName") { type = NavType.StringType },
+                navArgument(name = "productName") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            ProductScreen(
+                categoryName = backStackEntry.arguments?.getString("categoryName")!!,
+                productName = backStackEntry.arguments?.getString("productName")!!,
+                navigateBack = { navController.popBackStack() })
         }
         composable(route = "settings") {
             SettingsScreen(navigateBack = { navController.popBackStack() })
+        }
+        composable(route = "search") {
+            SearchScreen(
+                navigateBack = { navController.popBackStack() },
+                navigateToProduct = { product ->
+                    navController.popBackStack()
+                    navigateToProduct(product)
+                }
+            )
         }
     }
 }
