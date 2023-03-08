@@ -34,9 +34,10 @@ class CategoriesViewModel(
         viewModelScope.launch {
             _categories.value = repository.getCategories()
             ProductRepositoryImpl.getProduct("Mango","Dried Fruit")
-            ProductRepositoryImpl.createProduct("Dried Fruit", "3", "Pineapple", 13, 100f)
-            CategoryRepositoryImpl.createCategory("Nuts")
-            ProductRepositoryImpl.createProduct("Nuts", "0", "Cashew", 7, 100f)
+            //ProductRepositoryImpl.createProduct("Dried Fruit", "3", "Pineapple", 13, 100f, true)
+            //CategoryRepositoryImpl.createCategory("Nuts")
+            //ProductRepositoryImpl.createProduct("Nuts", "0", "Cashew", 7, 100f, true)
+            ProductRepositoryImpl.getProduct("3", "Dried Fruit")
         }
     }
 
