@@ -63,7 +63,7 @@ class NfcRepositoryImpl(
             Toast.makeText(activity, "NFC is not enabled", Toast.LENGTH_LONG).show()
         }
 
-        val nameCode = product.name.padEnd(length = 12).subSequence(0, 12)
+        val nameCode = product.productName.padEnd(length = 12).subSequence(0, 12)
         messages.send(element = "${product.portionSize}_${product.pricePerKg}_${nameCode}_")
         repository.updateProduct(product.copy(isUpdated = true))
     }

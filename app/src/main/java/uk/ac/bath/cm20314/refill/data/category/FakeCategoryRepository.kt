@@ -1,11 +1,14 @@
 package uk.ac.bath.cm20314.refill.data.category
 
-class FakeCategoryRepository : CategoryRepository {
+object FakeCategoryRepository : CategoryRepository {
 
     var data = mutableListOf(
         Category(categoryName = "Category 1", itemCount = 1, isUpdated = true),
         Category(categoryName = "Category 2", itemCount = 2, isUpdated = true),
-        Category(categoryName = "Category 3", itemCount = 3, isUpdated = true)
+        Category(categoryName = "Category 3", itemCount = 3, isUpdated = true),
+        Category(categoryName = "Category 4", itemCount = 4, isUpdated = true),
+        Category(categoryName = "Category 5", itemCount = 5, isUpdated = true),
+        Category(categoryName = "Category 6", itemCount = 6, isUpdated = true),
     )
 
     override suspend fun getCategories(): List<Category> {

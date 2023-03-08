@@ -31,10 +31,10 @@ import uk.ac.bath.cm20314.refill.ui.common.RefillList
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
-    categoryId: String,
+    categoryName: String,
     navigateToProduct: (Product) -> Unit,
     navigateBack: () -> Unit,
-    viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryId))
+    viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryName))
 ) {
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }

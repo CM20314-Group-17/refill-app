@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepository
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepositoryImpl
+import uk.ac.bath.cm20314.refill.data.category.defaultCategoryRepository
 import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.data.product.ProductRepository
 import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
+import uk.ac.bath.cm20314.refill.data.product.defaultProductRepository
 
 class SearchViewModel(
     private val categoryRepository: CategoryRepository,
@@ -24,13 +26,13 @@ class SearchViewModel(
 
     private val _products = MutableStateFlow(emptyList<Product>())
     val results = _products.asStateFlow().combine(query) { products, query ->
-        products.filter { query.isNotBlank() && it.name.contains(query, ignoreCase = true) }
+        products.filter { query.isNotBlank() && it.productName.contains(query, ignoreCase = true) }
     }
 
     init {
         viewModelScope.launch {
             val categories = categoryRepository.getCategories()
-            _products.value = categories.flatMap { productRepository.getProducts(it.categoryId) }
+            _products.value = categories.flatMap { productRepository.getProducts(it.categoryName) }
         }
     }
 
@@ -41,7 +43,7 @@ class SearchViewModel(
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                SearchViewModel(CategoryRepositoryImpl, ProductRepositoryImpl)
+                SearchViewModel(defaultCategoryRepository, defaultProductRepository)
             }
         }
     }

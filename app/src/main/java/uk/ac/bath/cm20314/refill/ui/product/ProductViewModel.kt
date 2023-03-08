@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.data.product.ProductRepository
-import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
+import uk.ac.bath.cm20314.refill.data.product.defaultProductRepository
 
 class ProductViewModel(
-    categoryId: String,
-    productId: String,
+    categoryName: String,
+    productName: String,
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
@@ -32,39 +32,39 @@ class ProductViewModel(
 
     init {
         viewModelScope.launch {
-            _product.value = productRepository.getProduct(categoryId, productId)
+            _product.value = productRepository.getProduct(productName = productName, categoryName = categoryName)
         }
     }
 
     fun updateProduct(name: String) {
         viewModelScope.launch {
             _product.update { product ->
-                previousName = product?.name
-                product?.copy(name = name) ?: product
+                previousName = product?.productName
+                product?.copy(productName = name) ?: product
             }
             _product.value?.let { productRepository.updateProduct(it) }
-            _events.send(ProductViewModel.Event.ProductUpdated)
+            _events.send(Event.ProductUpdated)
         }
     }
 
     fun undoUpdateProduct() {
         viewModelScope.launch {
             // TODO: Fix problem that the title doesn't update when undoing rename.
-            _product.value = product.value?.copy(name = previousName!!)
+            _product.value = product.value?.copy(productName = previousName!!)
             _product.value?.let { productRepository.updateProduct(it) }
         }
     }
     fun deleteProduct() = viewModelScope.launch {
-        _product.value?.let { productRepository.deleteProduct(it.categoryId, it.productId) }
+        _product.value?.let { productRepository.deleteProduct(it.productName, it.categoryName) }
     }
 
     class Factory(
-        private val categoryId: String,
-        private val productId: String
+        private val categoryName: String,
+        private val productName: String
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>) =
-            ProductViewModel(categoryId, productId, ProductRepositoryImpl) as T
+            ProductViewModel(categoryName, productName, defaultProductRepository) as T
     }
 }

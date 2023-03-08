@@ -2,7 +2,6 @@ package uk.ac.bath.cm20314.refill.ui.product
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
@@ -10,23 +9,16 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
-import androidx.compose.material3.ButtonDefaults.shape
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,18 +30,14 @@ import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.nfc.LocalNfc
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
-import uk.ac.bath.cm20314.refill.ui.product.DeleteProductDialog
-import uk.ac.bath.cm20314.refill.ui.product.EditProductDialog
-import uk.ac.bath.cm20314.refill.ui.product.ProductTopBar
-import uk.ac.bath.cm20314.refill.ui.product.ProductViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(
-    categoryId: String,
-    productId: String,
+    categoryName: String,
+    productName: String,
     navigateBack: () -> Unit,
-    viewModel: ProductViewModel = viewModel(factory = ProductViewModel.Factory(categoryId, productId))
+    viewModel: ProductViewModel = viewModel(factory = ProductViewModel.Factory(categoryName, productName))
 ) {
     val product by viewModel.product.collectAsState()
 
@@ -88,7 +76,7 @@ fun ProductScreen(
     RefillLayout(
         topBar = { scrollBehaviour ->
             ProductTopBar(
-                productName = product?.name ?: "",
+                productName = product?.productName ?: "",
                 editProduct = { editDialogOpen = true },
                 onDeleteProduct = { deleteDialogOpen = true },
                 navigateBack = navigateBack,

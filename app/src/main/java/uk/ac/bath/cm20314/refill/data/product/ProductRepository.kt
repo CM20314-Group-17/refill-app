@@ -1,5 +1,7 @@
 package uk.ac.bath.cm20314.refill.data.product
 
+val defaultProductRepository: ProductRepository = FakeProductRepository
+
 interface ProductRepository {
 
     /** Gets the products in a particular category. */
@@ -12,7 +14,7 @@ interface ProductRepository {
     suspend fun updateProduct(product: Product)
 
     /** Creates a new product. */
-    suspend fun createProduct(categoryName: String,productName: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean): Product?
+    suspend fun createProduct(categoryName: String, productName: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean): Product?
 
     /** Deletes an existing product. */
     suspend fun deleteProduct(productName: String, categoryName: String)
