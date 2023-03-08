@@ -20,22 +20,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
+import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
-import uk.ac.bath.cm20314.refill.ui.common.SearchDialog
 
 /** Displays a list of product categories. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CategoriesScreen(
-    navigateToCategory: (categoryId: String) -> Unit,
+    navigateToCategory: (Category) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToSearch: () -> Unit,
     viewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
-    var searchDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-    var searchText by rememberSaveable { mutableStateOf(value = "") }
     val categories by viewModel.categories.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -60,11 +59,8 @@ fun CategoriesScreen(
     RefillLayout(
         topBar = { scrollBehaviour ->
             CategoriesTopBar(
-                navigateToSearch = {
-                    searchText = ""
-                    searchDialogOpen = true
-                },
                 navigateToSettings = navigateToSettings,
+                navigateToSearch = navigateToSearch,
                 scrollBehaviour = scrollBehaviour
             )
         },
@@ -79,12 +75,10 @@ fun CategoriesScreen(
         snackbarHostState = snackbarHostState
     ) {
         RefillList(items = categories) { category ->
-            val count = category.itemCount
-
             RefillCard(
                 title = category.categoryName,
-                label = pluralStringResource(R.plurals.categories_items, count, count),
-                onClick = { navigateToCategory(category.id) }
+                label = pluralStringResource(R.plurals.categories_items, category.itemCount, category.itemCount),
+                onClick = { navigateToCategory(category) }
             ) {
                 // TODO: Display image rather than a block colour.
                 Box(
@@ -95,16 +89,6 @@ fun CategoriesScreen(
                 )
             }
         }
-    }
-
-    SearchDialog(
-        active = searchDialogOpen,
-        query = searchText,
-        placeholder = stringResource(R.string.search_placeholder),
-        onClose = { searchDialogOpen = false },
-        onQueryChange = { searchText = it }
-    ) {
-        // TODO: Add search results.
     }
 
     if (createDialogOpen) {
@@ -183,10 +167,7 @@ private fun CreateCategoryDialog(
         },
         text = {
             Column {
-                Text(
-                    text = "Create a new product category.",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Text(text = "Create a new product category.")
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(top = 16.dp)

@@ -40,4 +40,21 @@
     <string name="category_search">Search</string>
     <string name="category_add">Add</string>
     <string name="category_settings">Settings</string>
+
+    <!-- Product -->
+    <string name="product_new">New Product</string>
+    <string name="product_edit">Edit Product</string>
+    <string name="product_save">Save</string>
+    <string name="product_name">Name</string>
+    <string name="product_close">Close</string>
+
+    <string name="product_title">Products</string>
+    <string name="product_search">Search</string>
+    <string name="product_add">Add</string>
+    <string name="product_settings">Settings</string>
+
+    <string name="product_price_by_weight">Price by weight</string>
+    <string name="product_portion_size">Portion size</string>
+    <string name="product_last_updated">Last updated</string>
+    <string name="product_nfc">NFC</string>
 </resources>

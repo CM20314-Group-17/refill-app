@@ -53,4 +53,10 @@ class CategoryViewModelTest {
         assertEquals("Category 1", categoryRepository.data[0].name)
         assertEquals("Category 1", viewModel.category.value?.name)
     }
+
+    @Test
+    fun testDeleteCategory() = runTest {
+        viewModel.deleteCategory()
+        assertEquals("Category 2", categoryRepository.data[0].name)
+    }
 }

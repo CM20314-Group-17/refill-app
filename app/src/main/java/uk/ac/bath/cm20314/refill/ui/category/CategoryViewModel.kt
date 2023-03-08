@@ -1,6 +1,5 @@
 package uk.ac.bath.cm20314.refill.ui.category
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -63,6 +62,10 @@ class CategoryViewModel(
             _category.value = category.value?.copy(categoryName = previousName!!)
             _category.value?.let { categoryRepository.updateCategory(it) }
         }
+    }
+
+    fun deleteCategory() = viewModelScope.launch {
+        _category.value?.let { categoryRepository.deleteCategory(it.categoryId) }
     }
 
     class Factory(private val categoryId: String) : ViewModelProvider.Factory {
