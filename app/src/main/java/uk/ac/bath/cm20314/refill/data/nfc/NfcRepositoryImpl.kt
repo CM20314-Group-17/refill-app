@@ -8,6 +8,8 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NdefFormatable
 import android.widget.Toast
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.channels.Channel
 import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.data.product.ProductRepository
@@ -15,13 +17,14 @@ import uk.ac.bath.cm20314.refill.data.product.ProductRepository
 class NfcRepositoryImpl(
     private val activity: Activity,
     private val repository: ProductRepository
-) : NfcRepository {
+) : NfcRepository, DefaultLifecycleObserver {
 
     private val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(activity)
     private val messages = Channel<String>()
 
-    /** Start listening for nearby NFC tags. */
-    fun enableNfc() {
+    /** Starts listening for nearby NFC tags. */
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
         nfcAdapter?.enableReaderMode(
             activity,
             this::onTagDiscovered,
@@ -34,11 +37,13 @@ class NfcRepositoryImpl(
         )
     }
 
-    /** Stop listening for nearby NFC tags. */
-    fun disableNfc() {
+    /** Stops listening for nearby NFC tags. */
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
         nfcAdapter?.disableReaderMode(activity)
     }
 
+    /** Called when the device discovers an NFC tag nearby. */
     private fun onTagDiscovered(tag: Tag) {
         val payload = messages.tryReceive().getOrNull() ?: return
         val message = NdefMessage(NdefRecord.createTextRecord("en", payload))
