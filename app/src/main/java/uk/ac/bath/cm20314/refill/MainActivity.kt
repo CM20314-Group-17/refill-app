@@ -21,6 +21,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         nfcRepository = NfcRepositoryImpl(this, ProductRepositoryImpl)
+        lifecycle.addObserver(nfcRepository)
 
         // Allow content to appear behind the status bar and navigation bar.
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -32,15 +33,5 @@ class MainActivity : ComponentActivity() {
                 RefillApp()
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        nfcRepository.enableNfc()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        nfcRepository.disableNfc()
     }
 }

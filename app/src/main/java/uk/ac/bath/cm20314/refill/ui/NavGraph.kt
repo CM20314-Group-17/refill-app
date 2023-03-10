@@ -20,7 +20,6 @@ import uk.ac.bath.cm20314.refill.ui.settings.SettingsScreen
 fun NavGraph(navController: NavHostController = rememberNavController()) {
 
     // Lambda functions that navigate to each screen.
-    // Some screens require arguments, such as the id of the record to retrieve from the database.
     val navigateToCategory = { category: Category ->
         navController.navigate(route = "category/${category.categoryName}") {
             launchSingleTop = true
@@ -40,6 +39,10 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         navController.navigate(route = "search") {
             launchSingleTop = true
         }
+    }
+    val navigateBack = {
+        navController.popBackStack()
+        Unit
     }
 
     // The NavHost displays the current screen based on the navController.
@@ -61,7 +64,7 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             CategoryScreen(
                 categoryName = backStackEntry.arguments?.getString("categoryName")!!,
                 navigateToProduct = navigateToProduct,
-                navigateBack = { navController.popBackStack() }
+                navigateBack = navigateBack
             )
         }
         composable(
@@ -74,16 +77,19 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             ProductScreen(
                 categoryName = backStackEntry.arguments?.getString("categoryName")!!,
                 productName = backStackEntry.arguments?.getString("productName")!!,
-                navigateBack = { navController.popBackStack() })
+                navigateBack = navigateBack
+            )
         }
         composable(route = "settings") {
-            SettingsScreen(navigateBack = { navController.popBackStack() })
+            SettingsScreen(
+                navigateBack = navigateBack
+            )
         }
         composable(route = "search") {
             SearchScreen(
-                navigateBack = { navController.popBackStack() },
+                navigateBack = navigateBack,
                 navigateToProduct = { product ->
-                    navController.popBackStack()
+                    navigateBack()
                     navigateToProduct(product)
                 }
             )

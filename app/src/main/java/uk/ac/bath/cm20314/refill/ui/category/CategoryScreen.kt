@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.android.awaitFrame
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
@@ -55,7 +54,7 @@ fun CategoryScreen(
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.category.collect()
+                        viewModel.undoUpdateCategory()
                     }
                 }
             }
@@ -84,7 +83,7 @@ fun CategoryScreen(
     ) {
         RefillList(items = products) { product ->
             RefillCard(
-                title = product.productName,//THIS USED TO SAY PRODUCT.NAME
+                title = product.productName,
                 label = "${product.pricePerKg}p / 100g",
                 onClick = { navigateToProduct(product) }
             ) {

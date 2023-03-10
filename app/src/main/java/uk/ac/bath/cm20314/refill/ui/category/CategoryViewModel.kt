@@ -7,15 +7,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepository
-import uk.ac.bath.cm20314.refill.data.category.CategoryRepositoryImpl
 import uk.ac.bath.cm20314.refill.data.category.defaultCategoryRepository
 import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.data.product.ProductRepository
-import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
 import uk.ac.bath.cm20314.refill.data.product.defaultProductRepository
 
 class CategoryViewModel(
