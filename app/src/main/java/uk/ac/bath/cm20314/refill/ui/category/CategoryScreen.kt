@@ -72,7 +72,10 @@ fun CategoryScreen(
             )
         },
         actions = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(
+                onClick = { /*TODO*/ },
+                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.category_add)

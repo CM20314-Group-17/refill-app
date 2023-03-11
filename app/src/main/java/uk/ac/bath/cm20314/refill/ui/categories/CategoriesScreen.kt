@@ -65,7 +65,10 @@ fun CategoriesScreen(
             )
         },
         actions = {
-            FloatingActionButton(onClick = { createDialogOpen = true }) {
+            FloatingActionButton(
+                onClick = { createDialogOpen = true },
+                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.categories_add)

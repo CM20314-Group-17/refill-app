@@ -1,5 +1,6 @@
 package uk.ac.bath.cm20314.refill.ui.settings
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
@@ -28,7 +29,10 @@ import uk.ac.bath.cm20314.refill.ui.rememberDarkTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navigateBack: () -> Unit) {
+fun SettingsScreen(navigateToCategories: () -> Unit) {
+    BackHandler {
+        navigateToCategories()
+    }
     RefillLayout(
         topBar = { scrollBehaviour ->
             TopAppBar(
@@ -36,7 +40,7 @@ fun SettingsScreen(navigateBack: () -> Unit) {
                     Text(text = stringResource(R.string.settings_title))
                 },
                 navigationIcon = {
-                    IconButton(onClick = navigateBack) {
+                    IconButton(onClick = navigateToCategories) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = stringResource(R.string.settings_back)

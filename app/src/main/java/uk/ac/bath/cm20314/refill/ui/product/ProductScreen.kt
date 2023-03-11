@@ -97,7 +97,8 @@ fun ProductScreen(
                             nfcDialogOpen = false
                         }
                     }
-                }
+                },
+                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
             )
         },
         snackbarHostState = snackbarHostState
@@ -214,9 +215,7 @@ private fun ProductTopBar(
     TopAppBar(
         title = { Text(text = productName) },
         navigationIcon = {
-            IconButton(onClick = {
-                navigateBack()
-            }) {
+            IconButton(onClick = { navigateBack() }) {
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
             }
         },

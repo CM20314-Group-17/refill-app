@@ -21,28 +21,38 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
 
     // Lambda functions that navigate to each screen.
     val navigateToCategories = {
-        navController.navigate("categories") {
-            launchSingleTop = true
+        navController.navigate(route = "categories") {
+            popUpTo(route = "categories") {
+                inclusive = true
+            }
         }
     }
     val navigateToCategory = { category: Category ->
         navController.navigate(route = "category/${category.categoryName}") {
-            launchSingleTop = true
+            popUpTo(route = "category") {
+                inclusive = true
+            }
         }
     }
     val navigateToProduct = { product: Product ->
         navController.navigate(route = "product/${product.categoryName}/${product.productName}") {
-            launchSingleTop = true
+            popUpTo(route = "product") {
+                inclusive = true
+            }
         }
     }
     val navigateToSettings = {
         navController.navigate(route = "settings") {
-            launchSingleTop = true
+            popUpTo(route = "settings") {
+                inclusive = true
+            }
         }
     }
     val navigateToSearch = {
         navController.navigate(route = "search") {
-            launchSingleTop = true
+            popUpTo(route = "search") {
+                inclusive = true
+            }
         }
     }
     val navigateBack = {
@@ -87,7 +97,7 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = "settings") {
             SettingsScreen(
-                navigateBack = navigateToCategories
+                navigateToCategories = navigateToCategories
             )
         }
         composable(route = "search") {
