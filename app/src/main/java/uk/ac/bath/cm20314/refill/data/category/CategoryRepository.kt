@@ -1,6 +1,6 @@
 package uk.ac.bath.cm20314.refill.data.category
 
-val defaultCategoryRepository: CategoryRepository = FakeCategoryRepository
+var defaultCategoryRepository: CategoryRepository = FakeCategoryRepository
 
 interface CategoryRepository {
 

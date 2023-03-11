@@ -1,18 +1,13 @@
 package uk.ac.bath.cm20314.refill.ui.settings
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -21,6 +16,12 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
+import uk.ac.bath.cm20314.refill.data.category.CategoryRepositoryImpl
+import uk.ac.bath.cm20314.refill.data.category.FakeCategoryRepository
+import uk.ac.bath.cm20314.refill.data.category.defaultCategoryRepository
+import uk.ac.bath.cm20314.refill.data.product.FakeProductRepository
+import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
+import uk.ac.bath.cm20314.refill.data.product.defaultProductRepository
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.dataStore
 import uk.ac.bath.cm20314.refill.ui.rememberDarkTheme
@@ -48,6 +49,7 @@ fun SettingsScreen(navigateBack: () -> Unit) {
     ) {
         Column {
             ThemeSelection()
+            DatabaseToggle()
         }
     }
 }
@@ -61,7 +63,8 @@ private fun ThemeSelection() {
 
         Text(
             text = stringResource(R.string.settings_theme),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.labelLarge
         )
         RadioOption(
             text = stringResource(R.string.settings_theme_light),
@@ -127,5 +130,38 @@ private fun RadioOption(
             text = text,
             modifier = Modifier.padding(start = 16.dp)
         )
+    }
+}
+
+@Composable
+private fun DatabaseToggle() {
+    var remoteDatabase by remember {
+        mutableStateOf(defaultCategoryRepository == CategoryRepositoryImpl)
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = "Database",
+            style = MaterialTheme.typography.labelLarge
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Use remote database",
+                modifier = Modifier.weight(1f)
+            )
+            Switch(
+                checked = remoteDatabase,
+                onCheckedChange = { checked ->
+                    remoteDatabase = checked
+                    if (remoteDatabase) {
+                        defaultCategoryRepository = CategoryRepositoryImpl
+                        defaultProductRepository = ProductRepositoryImpl
+                    } else {
+                        defaultCategoryRepository = FakeCategoryRepository
+                        defaultProductRepository = FakeProductRepository
+                    }
+                }
+            )
+        }
     }
 }

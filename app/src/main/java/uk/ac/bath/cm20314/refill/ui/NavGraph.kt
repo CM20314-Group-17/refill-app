@@ -20,6 +20,11 @@ import uk.ac.bath.cm20314.refill.ui.settings.SettingsScreen
 fun NavGraph(navController: NavHostController = rememberNavController()) {
 
     // Lambda functions that navigate to each screen.
+    val navigateToCategories = {
+        navController.navigate("categories") {
+            launchSingleTop = true
+        }
+    }
     val navigateToCategory = { category: Category ->
         navController.navigate(route = "category/${category.categoryName}") {
             launchSingleTop = true
@@ -82,14 +87,14 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = "settings") {
             SettingsScreen(
-                navigateBack = navigateBack
+                navigateBack = navigateToCategories
             )
         }
         composable(route = "search") {
             SearchScreen(
                 navigateBack = navigateBack,
                 navigateToProduct = { product ->
-                    navigateBack()
+                    navigateToCategories()
                     navigateToProduct(product)
                 }
             )

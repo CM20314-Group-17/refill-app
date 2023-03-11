@@ -1,6 +1,6 @@
 package uk.ac.bath.cm20314.refill.data.product
 
-val defaultProductRepository: ProductRepository = FakeProductRepository
+var defaultProductRepository: ProductRepository = FakeProductRepository
 
 interface ProductRepository {
 
