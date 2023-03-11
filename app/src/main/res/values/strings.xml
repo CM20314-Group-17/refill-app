@@ -53,8 +53,9 @@
     <string name="product_add">Add</string>
     <string name="product_settings">Settings</string>
 
-    <string name="product_price_by_weight">Price by weight</string>
+    <string name="product_price_label">Price</string>
+    <string name="product_price">£%1$.2f/100g</string>
     <string name="product_portion_size">Portion size</string>
-    <string name="product_last_updated">Last updated</string>
-    <string name="product_nfc">NFC</string>
+    <string name="product_changes_pending">Changed pending</string>
+    <string name="product_nfc">Write to NFC tag</string>
 </resources>

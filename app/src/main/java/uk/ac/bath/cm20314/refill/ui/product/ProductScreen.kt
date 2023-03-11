@@ -2,9 +2,10 @@ package uk.ac.bath.cm20314.refill.ui.product
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
@@ -14,22 +15,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.nfc.LocalNfc
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +34,12 @@ fun ProductScreen(
     categoryName: String,
     productName: String,
     navigateBack: () -> Unit,
-    viewModel: ProductViewModel = viewModel(factory = ProductViewModel.Factory(categoryName, productName))
+    viewModel: ProductViewModel = viewModel(
+        factory = ProductViewModel.Factory(
+            categoryName,
+            productName
+        )
+    )
 ) {
     val product by viewModel.product.collectAsState()
 
@@ -47,11 +49,6 @@ fun ProductScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    //
-    // Temporary UI for testing NFC.
-    //
-
-    // Don't reuse the NFC coroutine scope since it may be cancelled.
     val nfcCoroutineScope = rememberCoroutineScope()
     val nfcRepository = LocalNfc.current
     var nfcDialogOpen by rememberSaveable { mutableStateOf(false) }
@@ -66,7 +63,7 @@ fun ProductScreen(
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.product.collect()
+                        TODO()
                     }
                 }
             }
@@ -76,55 +73,22 @@ fun ProductScreen(
     RefillLayout(
         topBar = { scrollBehaviour ->
             ProductTopBar(
-                productName = product?.productName ?: "",
+                productName = productName,
                 editProduct = { editDialogOpen = true },
                 onDeleteProduct = { deleteDialogOpen = true },
                 navigateBack = navigateBack,
                 scrollBehaviour = scrollBehaviour
             )
         },
-        snackbarHostState = snackbarHostState
-    ) {
-        Column(Modifier.fillMaxSize().padding(30.dp).background(Color.Red) ){
-            Text(text = stringResource(id = R.string.product_price_by_weight), fontStyle = FontStyle.Italic, fontSize = 20.sp)
-            Text(text = ((product?.pricePerKg ?: "").toString()+"p/100g"), fontWeight = FontWeight.Bold, fontSize = 60.sp)
-
-            Row(Modifier.weight(1f).padding(0.dp).background(Color.Green)) {
-                Column(Modifier.fillMaxWidth().weight(1f).padding(0.dp).background(Color.Blue)) {
-                    Text(
-                        text = stringResource(id = R.string.product_portion_size),
-                        fontStyle = FontStyle.Italic,
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Left,
+        actions = {
+            ExtendedFloatingActionButton(
+                text = { Text(text = stringResource(R.string.product_nfc)) },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.sharp_nfc_24),
+                        contentDescription = stringResource(R.string.product_nfc)
                     )
-                    Text(
-                        text = stringResource(id = R.string.product_last_updated),
-                        fontStyle = FontStyle.Italic,
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Left,
-                    )
-                }
-                Column(Modifier.fillMaxWidth().weight(1f).padding(0.dp).background(Color.Yellow)) {
-                    Text(
-                        text = (product?.portionSize ?: "None").toString(),
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Right,
-                    )
-                    // TODO: use isupdated bool to set this i suppose
-                    Text(
-                        text = "03/11/2002",
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Right,
-                    )
-                }
-            }
-
-            IconButton(
-                modifier = Modifier.size(128.dp).background(Color.Black),
+                },
                 onClick = {
                     nfcDialogOpen = true
                     product?.let { product ->
@@ -134,11 +98,59 @@ fun ProductScreen(
                         }
                     }
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Send,
-                    contentDescription = stringResource(R.string.product_nfc)
+            )
+        },
+        snackbarHostState = snackbarHostState
+    ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            // TODO: Display image rather than a block colour.
+            Box(
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+            Column(modifier = Modifier.padding(16.dp)) {
+                val price = product?.let { it.pricePerKg.toFloat() / 100 } ?: 0
+                val portion = product?.portionSize?.roundToInt()
+                val changes = product?.isUpdated == false
+
+                Text(
+                    text = stringResource(id = R.string.product_price_label),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                Text(
+                    text = stringResource(R.string.product_price, price),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Divider(modifier = Modifier.padding(vertical = 16.dp))
+                Row {
+                    Text(
+                        text = stringResource(R.string.product_portion_size),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "${portion}g",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                Divider(modifier = Modifier.padding(vertical = 16.dp))
+                Row {
+                    Text(
+                        text = stringResource(R.string.product_changes_pending),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = if (changes) "Yes" else "No",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                Divider(modifier = Modifier.padding(top = 16.dp, bottom = 72.dp))
             }
         }
     }
@@ -199,7 +211,7 @@ private fun ProductTopBar(
 ) {
     var dropdownOpen by remember { mutableStateOf(false) }
 
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = { Text(text = productName) },
         navigationIcon = {
             IconButton(onClick = {
@@ -212,13 +224,15 @@ private fun ProductTopBar(
             IconButton(onClick = editProduct) {
                 Icon(
                     imageVector = Icons.Outlined.Edit,
-                    contentDescription = stringResource(R.string.product_edit)
+                    contentDescription = stringResource(R.string.product_edit),
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             IconButton(onClick = { dropdownOpen = !dropdownOpen }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             DropdownMenu(
