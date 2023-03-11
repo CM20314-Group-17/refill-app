@@ -84,7 +84,7 @@ fun CategoryScreen(
         RefillList(items = products) { product ->
             RefillCard(
                 title = product.productName,
-                label = "${product.pricePerKg}p / 100g",
+                label = stringResource(R.string.product_price, product.pricePerKg.toFloat() / 100),
                 onClick = { navigateToProduct(product) }
             ) {
                 // TODO: Display image rather than a block colour.
@@ -129,12 +129,10 @@ private fun CategoryTopBar(
 ) {
     var dropdownOpen by remember { mutableStateOf(false) }
 
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = { Text(text = categoryName) },
         navigationIcon = {
-            IconButton(onClick = {
-                navigateBack()
-            }) {
+            IconButton(onClick = { navigateBack() }) {
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
             }
         },
@@ -142,13 +140,15 @@ private fun CategoryTopBar(
             IconButton(onClick = editCategory) {
                 Icon(
                     imageVector = Icons.Outlined.Edit,
-                    contentDescription = stringResource(R.string.category_edit)
+                    contentDescription = stringResource(R.string.category_edit),
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             IconButton(onClick = { dropdownOpen = !dropdownOpen }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             DropdownMenu(

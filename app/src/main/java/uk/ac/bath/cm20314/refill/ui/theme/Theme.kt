@@ -10,18 +10,32 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val LightColourScheme = lightColorScheme(
-    primary = DarkGreen,
-    secondary = Salmon,
-    tertiary = GreyGreen,
-    background = LightGrey,
+private val LightColours = lightColorScheme(
+    primary = Green20,
+    onPrimary = Neutral90,
+    primaryContainer = Green80,
+    onPrimaryContainer = Green20,
+    background = Neutral90,
+    onBackground = Neutral10,
+    surface = Neutral90,
+    onSurface = Neutral10,
+    surfaceVariant = Neutral80,
+    onSurfaceVariant = Neutral50,
+    outlineVariant = Neutral70,
 )
 
-private val DarkColourScheme = darkColorScheme(
-    primary = GreyGreen,
-    secondary = Salmon,
-    tertiary = LightGrey,
-    background = DarkGreen,
+private val DarkColours = darkColorScheme(
+    primary = Green60,
+    onPrimary = Neutral10,
+    primaryContainer = Green40,
+    onPrimaryContainer = Neutral90,
+    background = Neutral10,
+    onBackground = Neutral90,
+    surface = Neutral10,
+    onSurface = Neutral90,
+    surfaceVariant = Neutral20,
+    onSurfaceVariant = Neutral80,
+    outlineVariant = Neutral50,
 )
 
 /** Displays the content using the app's theme. */
@@ -31,6 +45,7 @@ fun RefillTheme(
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
+    val colours = if (darkTheme) DarkColours else LightColours
 
     SideEffect {
         if (!view.isInEditMode) {
@@ -44,7 +59,7 @@ fun RefillTheme(
 
     MaterialTheme(
         content = content,
-        colorScheme = if (darkTheme) DarkColourScheme else LightColourScheme,
+        colorScheme = colours,
         typography = Typography,
     )
 }

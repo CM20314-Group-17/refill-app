@@ -77,7 +77,11 @@ fun CategoriesScreen(
         RefillList(items = categories) { category ->
             RefillCard(
                 title = category.categoryName,
-                label = pluralStringResource(R.plurals.categories_items, category.itemCount, category.itemCount),
+                label = pluralStringResource(
+                    R.plurals.categories_items,
+                    category.itemCount,
+                    category.itemCount
+                ),
                 onClick = { navigateToCategory(category) }
             ) {
                 // TODO: Display image rather than a block colour.
@@ -120,7 +124,8 @@ private fun CategoriesTopBar(
             IconButton(onClick = navigateToSettings) {
                 Icon(
                     imageVector = Icons.Outlined.Settings,
-                    contentDescription = stringResource(R.string.categories_settings)
+                    contentDescription = stringResource(R.string.categories_settings),
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
