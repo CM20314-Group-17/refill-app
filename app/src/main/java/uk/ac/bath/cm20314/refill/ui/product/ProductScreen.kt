@@ -3,6 +3,7 @@ package uk.ac.bath.cm20314.refill.ui.product
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -17,6 +18,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.android.awaitFrame
@@ -157,9 +159,16 @@ fun ProductScreen(
     }
 
     if (editDialogOpen) {
+        val name = (product?.productName ?: "").toString()
+        val price = (product?.let { it.pricePerKg.toFloat() } ?: 0).toInt()
+        val portion = (product?.portionSize?.roundToInt() ?: 0f).toFloat()
+
         EditProductDialog(
             onSave = viewModel::updateProduct,
-            onClose = { editDialogOpen = false }
+            onClose = { editDialogOpen = false },
+            originalName = name,
+            originalPPK = price,
+            originalPortion = portion,
         )
     }
 
@@ -254,10 +263,15 @@ private fun ProductTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditProductDialog(
-    onSave: (String) -> Unit,
+    onSave: (String, Int, Float) -> Unit,
     onClose: () -> Unit,
+    originalName: String,
+    originalPPK: Int,
+    originalPortion: Float,
 ) {
-    var productName by rememberSaveable { mutableStateOf(value = "") }
+    var productName by rememberSaveable { mutableStateOf(value = originalName) }
+    var productPPK by rememberSaveable { mutableStateOf(value = originalPPK.toString()) }
+    var productPortion by rememberSaveable { mutableStateOf(value = originalPortion.toString()) }
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
@@ -270,9 +284,13 @@ private fun EditProductDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onSave(productName)
+                    onSave(productName.ifEmpty{ originalName },
+                        productPPK.toIntOrNull() ?: originalPPK,
+                        productPortion.toFloatOrNull() ?: originalPortion )
                     onClose()
-                    productName = ""
+                    productName = originalName
+                    productPPK = originalPPK.toString()
+                    productPortion = originalPortion.toString()
                 }
             ) {
                 Text(text = "Save")
@@ -282,7 +300,9 @@ private fun EditProductDialog(
             TextButton(
                 onClick = {
                     onClose()
-                    productName = ""
+                    productName = originalName
+                    productPPK = originalPPK.toString()
+                    productPortion = originalPortion.toString()
                 }
             ) {
                 Text(text = "Cancel")
@@ -290,7 +310,7 @@ private fun EditProductDialog(
         },
         text = {
             Column {
-                Text(text = "Rename the product.")
+                Text(text = "Edit product details.")
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(top = 16.dp)
@@ -298,6 +318,26 @@ private fun EditProductDialog(
                     label = { Text(text = stringResource(R.string.product_name)) },
                     value = productName,
                     onValueChange = { productName = it },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .focusRequester(focusRequester),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    label = { Text(text = stringResource(R.string.product_price_label)) },
+                    value = productPPK,
+                    onValueChange = { productPPK = it },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .focusRequester(focusRequester),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    label = { Text(text = stringResource(R.string.product_portion_size)) },
+                    value = productPortion,
+                    onValueChange = { productPortion = it },
                     singleLine = true
                 )
             }

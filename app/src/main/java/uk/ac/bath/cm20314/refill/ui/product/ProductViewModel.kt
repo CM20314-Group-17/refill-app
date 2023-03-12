@@ -29,6 +29,8 @@ class ProductViewModel(
     val product = _product.asStateFlow()
 
     private var previousName: String? = null
+    private var previousPPK: Int? = null
+    private var previousPortion: Float? = null
 
     init {
         viewModelScope.launch {
@@ -36,11 +38,15 @@ class ProductViewModel(
         }
     }
 
-    fun updateProduct(name: String) {
+    fun updateProduct(name: String, ppk: Int, portion: Float) {
         viewModelScope.launch {
             _product.update { product ->
                 previousName = product?.productName
-                product?.copy(productName = name) ?: product
+                previousPPK = product?.pricePerKg
+                previousPortion = product?.portionSize
+                product?.copy(productName = name,
+                              pricePerKg = ppk,
+                              portionSize = portion) ?: product
             }
             _product.value?.let { productRepository.updateProduct(it) }
             _events.send(Event.ProductUpdated)
