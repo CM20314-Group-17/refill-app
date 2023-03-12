@@ -23,11 +23,11 @@ object FakeProductRepository : ProductRepository {
     }
 
     override suspend fun updateProduct(product: Product) {
-        getProduct(product.categoryName, product.productName)?.apply {
+        getProduct(product.productName, product.categoryName)?.apply {
             productName = product.productName
             pricePerKg = product.pricePerKg
             portionSize = product.portionSize
-            isUpdated = product.isUpdated
+            isUpdated = false
         }
     }
 
