@@ -3,10 +3,10 @@ package uk.ac.bath.cm20314.refill.data.product
 import com.google.firebase.database.Exclude
 
 data class Product(
-    val categoryName: String,
-    var productName: String,
-    var pricePerKg: Int,
-    var portionSize: Float,
+    val categoryName: String = "",
+    var productName: String = "",
+    var pricePerKg: Int = 0,
+    var portionSize: Float = 0f,
     var isUpdated: Boolean = true
 ){
 

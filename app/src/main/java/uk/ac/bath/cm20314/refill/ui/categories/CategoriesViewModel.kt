@@ -34,6 +34,21 @@ class CategoriesViewModel(
     fun loadCategories() {
         viewModelScope.launch {
             _categories.value = repository.getCategories()
+            //CategoryRepositoryImpl.createCategory("Nuts")
+
+            //ProductRepositoryImpl.createProduct("Nuts", "Walnuts", 8, 100f, true)
+            //ProductRepositoryImpl.createProduct("Nuts", "Almonds", 11, 100f, true)
+            //ProductRepositoryImpl.createProduct("Dried Fruit", "Apricots", 10, 100f, true)
+            //ProductRepositoryImpl.createProduct("Dried Fruit", "Banana", 5, 100f, true)
+            //ProductRepositoryImpl.createProduct("Dried Fruit", "Mango", 15, 100f, true)
+            //ProductRepositoryImpl.createProduct("Pasta", "Spaghetti", 9, 100f, true)
+            //ProductRepositoryImpl.createProduct("Pasta", "Pennette (White)", 8, 100f, true)
+            //ProductRepositoryImpl.createProduct("Pasta", "Pennette (Wholewheat)", 9, 100f, true)
+            //ProductRepositoryImpl.createProduct("Pasta", "Tagliatelle", 5, 100f, true)
+            //ProductRepositoryImpl.createProduct("Pasta", "Vermicelli Noodles", 4, 100f, true)
+
+            ProductRepositoryImpl.getProduct("Pasta","Spaghetti")
+            //ProductRepositoryImpl.getProduct("Nuts", "Walnut")
         }
     }
 
