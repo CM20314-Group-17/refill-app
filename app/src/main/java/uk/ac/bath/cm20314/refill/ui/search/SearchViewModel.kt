@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepository
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepositoryImpl
@@ -17,23 +15,15 @@ import uk.ac.bath.cm20314.refill.data.product.ProductRepositoryImpl
 import uk.ac.bath.cm20314.refill.data.product.defaultProductRepository
 
 class SearchViewModel(
-    private val categoryRepository: CategoryRepository,
-    private val productRepository: ProductRepository
+    productRepository: ProductRepository
 ) : ViewModel() {
 
     private val _query = MutableStateFlow(value = "")
     val query = _query.asStateFlow()
 
-    private val _products = MutableStateFlow(emptyList<Product>())
-    val results = _products.asStateFlow().combine(query) { products, query ->
+    private val _products = productRepository.getAllProducts()
+    val results = _products.combine(query) { products, query ->
         products.filter { query.isNotBlank() && it.productName.contains(query, ignoreCase = true) }
-    }
-
-    init {
-        viewModelScope.launch {
-            val categories = categoryRepository.getCategories()
-            _products.value = categories.flatMap { productRepository.getProducts(it.categoryName) }
-        }
     }
 
     fun onQueryChange(query: String) {
@@ -43,7 +33,7 @@ class SearchViewModel(
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                SearchViewModel(defaultCategoryRepository, defaultProductRepository)
+                SearchViewModel(defaultProductRepository)
             }
         }
     }

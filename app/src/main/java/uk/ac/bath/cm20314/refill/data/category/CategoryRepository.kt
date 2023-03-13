@@ -1,21 +1,23 @@
 package uk.ac.bath.cm20314.refill.data.category
 
-var defaultCategoryRepository: CategoryRepository = FakeCategoryRepository
+import kotlinx.coroutines.flow.Flow
+
+var defaultCategoryRepository: CategoryRepository = CategoryRepositoryImpl
 
 interface CategoryRepository {
 
     /** Get all categories. */
-    suspend fun getCategories(): List<Category>
+    fun getCategories(): Flow<List<Category>>
 
     /** Gets the category with a particular id. */
-    suspend fun getCategory(categoryName: String): Category?
+    fun getCategory(categoryName: String): Flow<Category?>
 
     /** Updates an existing category. */
-    suspend fun updateCategory(category: Category, name: String)
+    fun updateCategory(category: Category)
 
     /** Creates a new category. */
-    suspend fun createCategory(categoryName: String): Category
+    fun createCategory(category: Category)
 
     /** Deletes an existing category. */
-    suspend fun deleteCategory(categoryName: String)
+    fun deleteCategory(categoryName: String)
 }
