@@ -1,6 +1,5 @@
 package uk.ac.bath.cm20314.refill.ui.categories
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -11,13 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.category.Category
@@ -37,11 +33,9 @@ fun CategoriesScreen(
     viewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
     var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-    val categories by viewModel.categories.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.loadCategories()
         viewModel.events.collectLatest { event ->
             when (event) {
                 CategoriesViewModel.Event.CategoryCreated -> {
@@ -51,7 +45,7 @@ fun CategoriesScreen(
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.undoCreateCategory()
+                        TODO()
                     }
                 }
             }
@@ -79,6 +73,8 @@ fun CategoriesScreen(
         },
         snackbarHostState = snackbarHostState
     ) {
+        val categories by viewModel.categories.collectAsState(initial = emptyList())
+
         RefillList(items = categories) { category ->
             RefillCard(
                 title = category.categoryName,
@@ -103,8 +99,9 @@ fun CategoriesScreen(
         visible = createDialogOpen,
         heading = { Text(text = "Create category") },
         onClose = { createDialogOpen = false },
-        onSave = { /*TODO*/ },
+        onSave = viewModel::createCategory,
         category = Category()
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

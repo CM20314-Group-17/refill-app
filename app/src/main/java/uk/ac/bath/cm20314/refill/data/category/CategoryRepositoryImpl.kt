@@ -1,36 +1,45 @@
 package uk.ac.bath.cm20314.refill.data.category
 
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import uk.ac.bath.cm20314.refill.data.asFlow
 
-private lateinit var database: DatabaseReference
 object CategoryRepositoryImpl : CategoryRepository {
 
+    private val reference = FirebaseDatabase.getInstance().getReference("Categories")
 
-    override suspend fun getCategories(): List<Category> {
-        // TODO: Replace with categories retrieved from the database.
-        return listOf(
-            Category(categoryName = "test", isUpdated = true, itemCount = 9),
-            Category(categoryName = "test", isUpdated = true, itemCount = 8),
-            Category(categoryName = "test", isUpdated = true, itemCount = 9),
-            Category(categoryName = "test", isUpdated = true, itemCount = 5),
-            Category(categoryName = "test", isUpdated = true, itemCount = 4)
-        )
+    override fun getCategories(): Flow<List<Category>> {
+        return reference.asFlow().map { snapshot ->
+            snapshot.children.mapNotNull { child ->
+                Category(
+                    categoryName = child.key ?: return@mapNotNull null,
+                    itemCount = child.child("products").childrenCount.toInt(),
+                    thumbnail = child.child("thumbnail").getValue(Int::class.java) ?: 0
+                )
+            }
+        }
     }
 
-    override suspend fun getCategory(categoryName: String): Category? {
-        TODO()
+    override fun getCategory(categoryName: String): Flow<Category?> {
+        return reference.child(categoryName).asFlow().map { snapshot ->
+            Category(
+                categoryName = categoryName,
+                itemCount = snapshot.child("products").childrenCount.toInt(),
+                thumbnail = snapshot.child("thumbnail").getValue(Int::class.java) ?: 0
+            )
+        }
     }
 
-    override suspend fun updateCategory(categoryName: Category, name: String) {
-        TODO()
+    override fun updateCategory(category: Category) {
+        // TODO - More difficult because the category name might have changed (see issue #10).
     }
 
-    override suspend fun createCategory(categoryName: String): Category {
-        TODO()
+    override fun createCategory(category: Category) {
+        reference.child(category.categoryName).setValue(true)
     }
 
-    override suspend fun deleteCategory(categoryId: String) {
-
+    override fun deleteCategory(categoryName: String) {
+        reference.child(categoryName).removeValue()
     }
 }

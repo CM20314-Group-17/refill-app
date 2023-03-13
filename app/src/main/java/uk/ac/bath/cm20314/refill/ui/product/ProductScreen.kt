@@ -1,6 +1,5 @@
 package uk.ac.bath.cm20314.refill.ui.product
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,14 +36,9 @@ fun ProductScreen(
     categoryName: String,
     productName: String,
     navigateBack: () -> Unit,
-    viewModel: ProductViewModel = viewModel(
-        factory = ProductViewModel.Factory(
-            categoryName,
-            productName
-        )
-    )
+    viewModel: ProductViewModel = viewModel(factory = ProductViewModel.Factory(categoryName, productName))
 ) {
-    val product by viewModel.product.collectAsState()
+    val product by viewModel.product.collectAsState(initial = null)
 
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
@@ -76,7 +70,7 @@ fun ProductScreen(
     RefillLayout(
         topBar = { scrollBehaviour ->
             ProductTopBar(
-                productName = productName,
+                productName = product?.productName ?: "",
                 editProduct = { editDialogOpen = true },
                 onDeleteProduct = { deleteDialogOpen = true },
                 navigateBack = navigateBack,
@@ -114,7 +108,7 @@ fun ProductScreen(
                     .fillMaxWidth()
             )
             Column(modifier = Modifier.padding(16.dp)) {
-                val price = product?.let { it.pricePerKg.toFloat() / 100 } ?: 0
+                val price = product?.let { it.pricePerKg.toFloat() / 100 } ?: 0f
                 val portion = product?.portionSize?.roundToInt()
                 val changes = product?.isUpdated == false
 
@@ -160,7 +154,7 @@ fun ProductScreen(
 
     if (editDialogOpen) {
         val name = (product?.productName ?: "").toString()
-        val price = (product?.let { it.pricePerKg.toFloat() } ?: 0).toInt()
+        val price = (product?.pricePerKg?.toFloat() ?: 0).toInt()
         val portion = (product?.portionSize?.roundToInt() ?: 0f).toFloat()
 
         EditProductDialog(
@@ -175,10 +169,8 @@ fun ProductScreen(
     if (deleteDialogOpen) {
         DeleteProductDialog(
             onDelete = {
-                coroutineScope.launch {
-                    viewModel.deleteProduct().join()
-                    navigateBack()
-                }
+                viewModel.deleteProduct()
+                navigateBack()
             },
             onClose = { deleteDialogOpen = false }
         )

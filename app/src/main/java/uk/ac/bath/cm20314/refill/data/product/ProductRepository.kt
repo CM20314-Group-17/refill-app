@@ -1,21 +1,26 @@
 package uk.ac.bath.cm20314.refill.data.product
 
-var defaultProductRepository: ProductRepository = FakeProductRepository
+import kotlinx.coroutines.flow.Flow
+
+var defaultProductRepository: ProductRepository = ProductRepositoryImpl
 
 interface ProductRepository {
 
-    /** Gets the products in a particular category. */
-    suspend fun getProducts(categoryName: String): List<Product>
+    /** Gets all products from all categories. */
+    fun getAllProducts(): Flow<List<Product>>
 
-    /** Gets the product with a particular id. */
-    suspend fun getProduct(categoryName: String, productName: String): Product?
+    /** Gets the products in a particular category. */
+    fun getProducts(categoryName: String): Flow<List<Product>>
+
+    /** Gets the product in a particular category with a particular id. */
+    fun getProduct(categoryName: String, productName: String): Flow<Product?>
 
     /** Updates an existing product. */
-    suspend fun updateProduct(product: Product)
+    fun updateProduct(product: Product)
 
     /** Creates a new product. */
-    suspend fun createProduct(categoryName: String, productName: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean): Product?
+    fun createProduct(product: Product)
 
     /** Deletes an existing product. */
-    suspend fun deleteProduct(productName: String, categoryName: String)
+    fun deleteProduct(categoryName: String, productName: String)
 }

@@ -1,6 +1,5 @@
 package uk.ac.bath.cm20314.refill.ui.category
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -12,14 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.product.Product
@@ -42,11 +37,10 @@ fun CategoryScreen(
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
 
-    val products by viewModel.products.collectAsState()
-    val category by viewModel.category.collectAsState()
+    val products by viewModel.products.collectAsState(initial = emptyList())
+    val category by viewModel.category.collectAsState(initial = null)
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
@@ -58,7 +52,7 @@ fun CategoryScreen(
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.undoUpdateCategory()
+                        TODO()
                     }
                 }
             }
@@ -108,7 +102,7 @@ fun CategoryScreen(
         visible = editDialogOpen,
         heading = { Text(text = "Edit category") },
         onClose = { editDialogOpen = false },
-        onSave = { /*TODO*/ },
+        onSave = viewModel::updateCategory,
         category = category ?: Category()
     )
 
@@ -116,17 +110,15 @@ fun CategoryScreen(
         visible = createDialogOpen,
         heading = { Text(text = "Create product") },
         onClose = { createDialogOpen = false },
-        onSave = { /*TODO*/ },
-        product = Product(categoryId = categoryId)
+        onSave = viewModel::createProduct,
+        product = Product(categoryName = categoryName)
     )
 
     if (deleteDialogOpen) {
         DeleteCategoryDialog(
             onDelete = {
-                coroutineScope.launch {
-                    viewModel.deleteCategory().join()
-                    navigateBack()
-                }
+                viewModel.deleteCategory()
+                navigateBack()
             },
             onClose = { deleteDialogOpen = false }
         )

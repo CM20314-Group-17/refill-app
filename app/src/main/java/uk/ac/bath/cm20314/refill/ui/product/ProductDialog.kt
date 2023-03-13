@@ -50,8 +50,8 @@ fun ProductDialog(
                     onSave(
                         product.copy(
                             productName = name,
-                            pricePerKg = price.toIntOrNull() ?: Product.Blank.pricePerKg,
-                            portionSize = portionSize.toFloatOrNull() ?: Product.Blank.portionSize,
+                            pricePerKg = price.toIntOrNull() ?: 0,
+                            portionSize = portionSize.toFloatOrNull() ?: 0f,
                             thumbnail = thumbnail
                         )
                     )
