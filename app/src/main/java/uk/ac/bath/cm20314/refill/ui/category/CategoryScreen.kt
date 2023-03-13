@@ -21,11 +21,13 @@ import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
+import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
 import uk.ac.bath.cm20314.refill.ui.common.Thumbnail
+import uk.ac.bath.cm20314.refill.ui.product.ProductDialog
 
 /** Displays a list of products within a category. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +40,7 @@ fun CategoryScreen(
 ) {
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
+    var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
 
     val products by viewModel.products.collectAsState()
     val category by viewModel.category.collectAsState()
@@ -74,7 +77,7 @@ fun CategoryScreen(
         },
         actions = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { createDialogOpen = true },
                 elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
             ) {
                 Icon(
@@ -101,12 +104,21 @@ fun CategoryScreen(
         }
     }
 
-    if (editDialogOpen) {
-        EditCategoryDialog(
-            onSave = viewModel::updateCategory,
-            onClose = { editDialogOpen = false }
-        )
-    }
+    CategoryDialog(
+        visible = editDialogOpen,
+        heading = { Text(text = "Edit category") },
+        onClose = { editDialogOpen = false },
+        onSave = { /*TODO*/ },
+        category = category ?: Category()
+    )
+
+    ProductDialog(
+        visible = createDialogOpen,
+        heading = { Text(text = "Create product") },
+        onClose = { createDialogOpen = false },
+        onSave = { /*TODO*/ },
+        product = Product(categoryId = categoryId)
+    )
 
     if (deleteDialogOpen) {
         DeleteCategoryDialog(
@@ -168,61 +180,6 @@ private fun CategoryTopBar(
             }
         },
         scrollBehavior = scrollBehaviour
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun EditCategoryDialog(
-    onSave: (String) -> Unit,
-    onClose: () -> Unit,
-) {
-    var categoryName by rememberSaveable { mutableStateOf(value = "") }
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        awaitFrame()
-        focusRequester.requestFocus()
-    }
-
-    AlertDialog(
-        title = { Text(text = "Edit Category") },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onSave(categoryName)
-                    onClose()
-                    categoryName = ""
-                }
-            ) {
-                Text(text = "Save")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onClose()
-                    categoryName = ""
-                }
-            ) {
-                Text(text = "Cancel")
-            }
-        },
-        text = {
-            Column {
-                Text(text = "Rename the product category.")
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                    label = { Text(text = stringResource(R.string.category_name)) },
-                    value = categoryName,
-                    onValueChange = { categoryName = it },
-                    singleLine = true
-                )
-            }
-        },
-        onDismissRequest = onClose
     )
 }
 

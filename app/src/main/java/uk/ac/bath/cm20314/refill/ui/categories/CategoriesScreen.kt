@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
+import uk.ac.bath.cm20314.refill.ui.category.CategoryDialog
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
 import uk.ac.bath.cm20314.refill.ui.common.Thumbnail
@@ -98,12 +99,12 @@ fun CategoriesScreen(
         }
     }
 
-    if (createDialogOpen) {
-        CreateCategoryDialog(
-            createCategory = viewModel::createCategory,
-            onClose = { createDialogOpen = false }
-        )
-    }
+    CategoryDialog(
+        visible = createDialogOpen,
+        heading = { Text(text = "Create category") },
+        onClose = { createDialogOpen = false },
+        onSave = { /*TODO*/ },
+        category = Category()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -133,63 +134,5 @@ private fun CategoriesTopBar(
             }
         },
         scrollBehavior = scrollBehaviour
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CreateCategoryDialog(
-    createCategory: (name: String) -> Unit,
-    onClose: () -> Unit,
-) {
-    var categoryName by rememberSaveable { mutableStateOf(value = "") }
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        awaitFrame()
-        focusRequester.requestFocus()
-    }
-
-    AlertDialog(
-        title = { Text(text = stringResource(R.string.category_new)) },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    createCategory(categoryName)
-                    onClose()
-                    categoryName = ""
-                }
-            ) {
-                Text(text = "Save")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onClose()
-                    categoryName = ""
-                }
-            ) {
-                Text(text = "Cancel")
-            }
-        },
-        text = {
-            Column {
-                Text(text = "Create a new product category.")
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                    label = { Text(text = stringResource(R.string.category_name)) },
-                    value = categoryName,
-                    onValueChange = { categoryName = it },
-                    singleLine = true
-                )
-            }
-        },
-        onDismissRequest = {
-            onClose()
-            categoryName = ""
-        }
     )
 }
