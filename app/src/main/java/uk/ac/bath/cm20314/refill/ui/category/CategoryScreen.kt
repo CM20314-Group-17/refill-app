@@ -25,6 +25,7 @@ import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
+import uk.ac.bath.cm20314.refill.ui.common.Thumbnail
 
 /** Displays a list of products within a category. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,12 +91,11 @@ fun CategoryScreen(
                 label = stringResource(R.string.product_price, product.pricePerKg.toFloat() / 100),
                 onClick = { navigateToProduct(product) }
             ) {
-                // TODO: Display image rather than a block colour.
-                Box(
+                Thumbnail(
+                    thumbnail = product.thumbnail,
                     modifier = Modifier
                         .height(100.dp)
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primary)
                 )
             }
         }

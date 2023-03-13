@@ -5,6 +5,7 @@ import com.google.firebase.database.Exclude
 data class Product(
     val categoryName: String = "",
     var productName: String = "",
+    var thumbnail: Int = 0,
     var pricePerKg: Int = 0,
     var portionSize: Float = 0f,
     var isUpdated: Boolean = true

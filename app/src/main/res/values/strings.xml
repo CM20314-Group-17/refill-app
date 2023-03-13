@@ -56,6 +56,6 @@
     <string name="product_price_label">Price</string>
     <string name="product_price">£%1$.2f/100g</string>
     <string name="product_portion_size">Portion size</string>
-    <string name="product_changes_pending">Changed pending</string>
+    <string name="product_changes_pending">Changes pending</string>
     <string name="product_nfc">Write to NFC tag</string>
 </resources>

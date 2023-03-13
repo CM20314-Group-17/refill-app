@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.nfc.LocalNfc
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
+import uk.ac.bath.cm20314.refill.ui.common.Thumbnail
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,12 +107,11 @@ fun ProductScreen(
         snackbarHostState = snackbarHostState
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            // TODO: Display image rather than a block colour.
-            Box(
+            Thumbnail(
+                thumbnail = product?.thumbnail ?: 0,
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary)
             )
             Column(modifier = Modifier.padding(16.dp)) {
                 val price = product?.let { it.pricePerKg.toFloat() / 100 } ?: 0

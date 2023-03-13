@@ -24,6 +24,7 @@ import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
+import uk.ac.bath.cm20314.refill.ui.common.Thumbnail
 
 /** Displays a list of product categories. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -87,12 +88,11 @@ fun CategoriesScreen(
                 ),
                 onClick = { navigateToCategory(category) }
             ) {
-                // TODO: Display image rather than a block colour.
-                Box(
+                Thumbnail(
+                    thumbnail = category.thumbnail,
                     modifier = Modifier
                         .height(100.dp)
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primary)
                 )
             }
         }
