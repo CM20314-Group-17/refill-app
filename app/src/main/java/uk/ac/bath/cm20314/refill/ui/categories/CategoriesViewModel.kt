@@ -34,6 +34,8 @@ class CategoriesViewModel(
     fun loadCategories() {
         viewModelScope.launch {
             _categories.value = repository.getCategories()
+            val a = CategoryRepositoryImpl.createCategory("Hey")
+            CategoryRepositoryImpl.updateCategory(a,"Hi")
         }
     }
 

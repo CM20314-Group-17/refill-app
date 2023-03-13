@@ -24,7 +24,9 @@ object CategoryRepositoryImpl : CategoryRepository {
     }
 
     override suspend fun updateCategory(category: Category, name: String) {
-        TODO()
+        val database = FirebaseDatabase.getInstance()
+        val ref = database.getReference("Categories")
+        ref.child(category.categoryName).setValue(name)
     }
 
     override suspend fun createCategory(categoryName: String): Category {
