@@ -1,16 +1,15 @@
 package uk.ac.bath.cm20314.refill.ui.category
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
+import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.category.FakeCategoryRepository
 import uk.ac.bath.cm20314.refill.data.product.FakeProductRepository
+import uk.ac.bath.cm20314.refill.data.product.Product
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CategoryViewModelTest {
@@ -21,42 +20,38 @@ class CategoryViewModelTest {
 
     @Before
     fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         categoryRepository = FakeCategoryRepository()
         productRepository = FakeProductRepository()
-        viewModel = CategoryViewModel(categoryName = "Category 1", categoryRepository, productRepository)
+        viewModel = CategoryViewModel("Category 1", categoryRepository, productRepository)
     }
 
     @Test
     fun testLoadCategory() = runTest {
-        assertEquals(categoryRepository.data[0], viewModel.category.value)
+        assertEquals(categoryRepository.data.value[0], viewModel.category.first())
     }
 
     @Test
     fun testLoadProducts() = runTest {
-        assertArrayEquals(productRepository.data.toTypedArray(), viewModel.products.value.toTypedArray())
+        assertEquals(productRepository.data.value, viewModel.products.first())
     }
 
     @Test
     fun testUpdateCategory() = runTest {
-        viewModel.updateCategory("Updated Category")
-        assertEquals("Updated Category", categoryRepository.data[0].categoryName)
-        assertEquals("Updated Category", viewModel.category.value?.categoryName)
-        assertEquals(CategoryViewModel.Event.CategoryUpdated, viewModel.events.first())
-    }
-
-    @Test
-    fun testUndoUpdateCategory() = runTest {
-        viewModel.updateCategory("updated category")
-        viewModel.events.first()
-        viewModel.undoUpdateCategory()
-        assertEquals("Category 1", categoryRepository.data[0].categoryName)
-        assertEquals("Category 1", viewModel.category.value?.categoryName)
+        viewModel.updateCategory(Category(categoryName = "Updated"))
+        assertEquals("Updated", categoryRepository.data.value[0].categoryName)
+        assertEquals("Updated", viewModel.category.first()?.categoryName)
     }
 
     @Test
     fun testDeleteCategory() = runTest {
         viewModel.deleteCategory()
-        assertEquals("Category 2", categoryRepository.data[0].categoryName)
+        assertNull(categoryRepository.data.value.find { it.categoryName == "Category 1" })
+    }
+
+    @Test
+    fun testCreateProduct() = runTest {
+        viewModel.createProduct(Product(categoryName = "Category 1", productName = "Product 4"))
+        assertEquals("Product 4", productRepository.data.value.last().productName)
+        assertEquals("Product 4", viewModel.products.first().last().productName)
     }
 }

@@ -1,33 +1,43 @@
 package uk.ac.bath.cm20314.refill.data.category
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import java.util.*
+
 class FakeCategoryRepository : CategoryRepository {
 
-    var data = mutableListOf(
-        Category(categoryName = "Category 1", itemCount = 1, isUpdated = true),
-        Category(categoryName = "Category 2", itemCount = 2, isUpdated = true),
-        Category(categoryName = "Category 3", itemCount = 3, isUpdated = true)
+    val data = MutableStateFlow(
+        value = listOf(
+            Category(categoryName = "Category 1", itemCount = 1),
+            Category(categoryName = "Category 2", itemCount = 2),
+            Category(categoryName = "Category 3", itemCount = 3),
+        )
     )
 
-    override suspend fun getCategories(): List<Category> {
-        return data.map { it.copy() }
+    override fun getCategories(): Flow<List<Category>> {
+        return data
     }
 
-    override suspend fun getCategory(categoryName: String): Category? {
-        return data.find { it.categoryName == categoryName }
-    }
-
-    override suspend fun updateCategory(category: Category, name: String) {
-        getCategory(category.categoryName)?.apply {
-            categoryName = name
-            isUpdated = category.isUpdated
+    override fun getCategory(categoryName: String): Flow<Category?> {
+        return data.map { categories ->
+            categories.find { it.categoryName == categoryName }
         }
     }
 
-    override suspend fun createCategory(categoryName: String): Category {
-        return Category(categoryName = categoryName, itemCount = 0).also { data.add(it) }
+    override fun updateCategory(category: Category) {
+        data.value = data.value.map {
+            if (it.categoryName == category.categoryName) category else it
+        }
     }
 
-    override suspend fun deleteCategory(categoryName: String) {
-        data.removeIf { it.categoryName == categoryName }
+    override fun createCategory(category: Category) {
+        data.value = data.value.toMutableList().apply { add(category) }
+    }
+
+    override fun deleteCategory(categoryName: String) {
+        data.value = data.value.mapNotNull {
+            if (it.categoryName == categoryName) null else it
+        }
     }
 }
