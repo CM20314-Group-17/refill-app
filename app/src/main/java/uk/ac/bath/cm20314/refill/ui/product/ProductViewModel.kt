@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.data.product.ProductRepository
 import uk.ac.bath.cm20314.refill.data.product.defaultProductRepository
 
@@ -28,8 +29,9 @@ class ProductViewModel(
     private var previousPPK: Int? = null
     private var previousPortion: Float? = null
 
-    fun updateProduct(name: String, ppk: Int, portion: Float) {
-        TODO()
+    fun updateProduct(product: Product) {
+        productRepository.updateProduct(product)
+        // TODO: Add undo back in with new repository.
 //        viewModelScope.launch {
 //            _product.update { product ->
 //                previousName = product?.productName

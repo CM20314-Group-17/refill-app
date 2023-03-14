@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.nfc.LocalNfc
+import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
 import uk.ac.bath.cm20314.refill.ui.common.Thumbnail
 import kotlin.math.roundToInt
@@ -152,19 +153,13 @@ fun ProductScreen(
         }
     }
 
-    if (editDialogOpen) {
-        val name = (product?.productName ?: "").toString()
-        val price = (product?.pricePerKg?.toFloat() ?: 0).toInt()
-        val portion = (product?.portionSize?.roundToInt() ?: 0f).toFloat()
-
-        EditProductDialog(
-            onSave = viewModel::updateProduct,
-            onClose = { editDialogOpen = false },
-            originalName = name,
-            originalPPK = price,
-            originalPortion = portion,
-        )
-    }
+    ProductDialog(
+        visible = editDialogOpen,
+        heading = { Text(text = "Edit product") },
+        onClose = { editDialogOpen = false },
+        onSave = viewModel::updateProduct,
+        product = product ?: Product()
+    )
 
     if (deleteDialogOpen) {
         DeleteProductDialog(
@@ -249,92 +244,6 @@ private fun ProductTopBar(
             }
         },
         scrollBehavior = scrollBehaviour
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun EditProductDialog(
-    onSave: (String, Int, Float) -> Unit,
-    onClose: () -> Unit,
-    originalName: String,
-    originalPPK: Int,
-    originalPortion: Float,
-) {
-    var productName by rememberSaveable { mutableStateOf(value = originalName) }
-    var productPPK by rememberSaveable { mutableStateOf(value = originalPPK.toString()) }
-    var productPortion by rememberSaveable { mutableStateOf(value = originalPortion.toString()) }
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        awaitFrame()
-        focusRequester.requestFocus()
-    }
-
-    AlertDialog(
-        title = { Text(text = "Edit Product") },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onSave(productName.ifEmpty{ originalName },
-                        productPPK.toIntOrNull() ?: originalPPK,
-                        productPortion.toFloatOrNull() ?: originalPortion )
-                    onClose()
-                    productName = originalName
-                    productPPK = originalPPK.toString()
-                    productPortion = originalPortion.toString()
-                }
-            ) {
-                Text(text = "Save")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onClose()
-                    productName = originalName
-                    productPPK = originalPPK.toString()
-                    productPortion = originalPortion.toString()
-                }
-            ) {
-                Text(text = "Cancel")
-            }
-        },
-        text = {
-            Column {
-                Text(text = "Edit product details.")
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                    label = { Text(text = stringResource(R.string.product_name)) },
-                    value = productName,
-                    onValueChange = { productName = it },
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    label = { Text(text = stringResource(R.string.product_price_label)) },
-                    value = productPPK,
-                    onValueChange = { productPPK = it },
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    label = { Text(text = stringResource(R.string.product_portion_size)) },
-                    value = productPortion,
-                    onValueChange = { productPortion = it },
-                    singleLine = true
-                )
-            }
-        },
-        onDismissRequest = onClose
     )
 }
 

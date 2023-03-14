@@ -6,6 +6,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -17,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
@@ -68,9 +71,10 @@ fun FullscreenDialog(
                     Column(
                         modifier = Modifier
                             .padding(top = offset)
-                            .padding(horizontal = 16.dp)
+                            .padding(16.dp)
                             .alpha(alpha)
-                            .navigationBarsPadding()
+                            .navigationBarsPadding(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         content()
                     }
@@ -78,6 +82,27 @@ fun FullscreenDialog(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogInput(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    numeric: Boolean = false,
+) {
+    OutlinedTextField(
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(text = label) },
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Words,
+            keyboardType = if (numeric) KeyboardType.Number else KeyboardType.Text
+        )
+    )
 }
 
 @Composable
