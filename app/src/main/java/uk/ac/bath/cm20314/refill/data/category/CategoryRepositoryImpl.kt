@@ -14,7 +14,7 @@ object CategoryRepositoryImpl : CategoryRepository {
             snapshot.children.mapNotNull { child ->
                 Category(
                     categoryName = child.key ?: return@mapNotNull null,
-                    itemCount = child.child("products").childrenCount.toInt(),
+                    itemCount = child.childrenCount.toInt(),
                     thumbnail = child.child("thumbnail").getValue(Int::class.java) ?: 0
                 )
             }
@@ -25,7 +25,7 @@ object CategoryRepositoryImpl : CategoryRepository {
         return reference.child(categoryName).asFlow().map { snapshot ->
             Category(
                 categoryName = categoryName,
-                itemCount = snapshot.child("products").childrenCount.toInt(),
+                itemCount = snapshot.childrenCount.toInt(),
                 thumbnail = snapshot.child("thumbnail").getValue(Int::class.java) ?: 0
             )
         }

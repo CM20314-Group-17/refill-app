@@ -1,14 +1,12 @@
 package uk.ac.bath.cm20314.refill.ui.categories
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.category.FakeCategoryRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -19,44 +17,26 @@ class CategoriesViewModelTest {
 
     @Before
     fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         repository = FakeCategoryRepository()
         viewModel = CategoriesViewModel(repository)
     }
 
     @Test
     fun testLoadCategories() = runTest {
-        viewModel.loadCategories()
-        assertArrayEquals(repository.data.toTypedArray(), viewModel.categories.value.toTypedArray())
+        assertEquals(repository.data.value, viewModel.categories.first())
     }
 
     @Test
     fun testCreateCategory() = runTest {
-        viewModel.createCategory("Category 4")
-        assertEquals("Category 4", repository.data.last().categoryName)
-        assertEquals(CategoriesViewModel.Event.CategoryCreated, viewModel.events.first())
+        viewModel.createCategory(Category(categoryName = "Category 4"))
+        assertEquals("Category 4", repository.data.value.last().categoryName)
+        assertEquals("Category 4", viewModel.categories.first().last().categoryName)
     }
 
     @Test
-    fun testReloadCategoriesAfterCreate() = runTest {
-        viewModel.createCategory("Category 4")
-        viewModel.events.first()
-        assertArrayEquals(repository.data.toTypedArray(), viewModel.categories.value.toTypedArray())
-    }
-
-    @Test
-    fun testUndoCreateCategory() = runTest {
-        viewModel.createCategory("Category 4")
-        viewModel.events.first()
-        viewModel.undoCreateCategory()
-        assertNull(repository.data.find { it.categoryName == "Category 4" })
-    }
-
-    @Test
-    fun testReloadCategoriesAfterUndo() = runTest {
-        viewModel.createCategory("Category 4")
-        viewModel.events.first()
-        viewModel.undoCreateCategory()
-        assertArrayEquals(repository.data.toTypedArray(), viewModel.categories.value.toTypedArray())
+    fun testCategoryThumbnail() = runTest {
+        viewModel.createCategory(Category(thumbnail = 11))
+        assertEquals(11, repository.data.value.last().thumbnail)
+        assertEquals(11, viewModel.categories.first().last().thumbnail)
     }
 }
