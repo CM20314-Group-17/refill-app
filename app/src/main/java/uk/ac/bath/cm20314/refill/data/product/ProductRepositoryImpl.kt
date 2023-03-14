@@ -47,7 +47,11 @@ object ProductRepositoryImpl : ProductRepository {
     }
 
     override fun createProduct(product: Product) {
-        reference.child(product.categoryName).child(product.productName).setValue(product)
+        val categoryRef = reference.child(product.categoryName)
+        val productKey = categoryRef.push().key
+        val productRef = categoryRef.child(productKey!!)
+        productRef.setValue(product)
+        //reference.child(product.categoryName).child(product.productName).setValue(product)
     }
 
     override fun deleteProduct(categoryName: String, productName: String) {
