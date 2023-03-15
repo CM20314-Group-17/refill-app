@@ -3,7 +3,8 @@ package uk.ac.bath.cm20314.refill.data.product
 import com.google.firebase.database.Exclude
 
 data class Product(
-    var categoryName: String = "",
+    @Exclude @JvmField var categoryId: String = "",
+    @Exclude @JvmField var productId: String = "",
     var productName: String = "",
     var thumbnail: Int = 0,
     var pricePerKg: Int = 0,
@@ -14,7 +15,7 @@ data class Product(
     @Exclude
     fun toMap(): Map<String, Any?> {
         return mapOf(
-            "categoryName" to categoryName,
+            "categoryName" to categoryId,
             "productName" to productName,
             "pricePerKg" to pricePerKg,
             "portionSize" to portionSize,

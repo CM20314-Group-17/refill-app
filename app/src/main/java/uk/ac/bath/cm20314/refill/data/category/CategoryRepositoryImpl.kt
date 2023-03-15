@@ -10,39 +10,41 @@ object CategoryRepositoryImpl : CategoryRepository {
     private val reference = FirebaseDatabase.getInstance().getReference("Categories")
 
     override fun getCategories(): Flow<List<Category>> {
-        return reference.asFlow().map { snapshot ->
-            snapshot.children.mapNotNull { child ->
+        return reference.asFlow().map { categories ->
+            categories.children.mapNotNull { category ->
                 Category(
-                    categoryName = child.key ?: return@mapNotNull null,
-                    itemCount = child.childrenCount.toInt(),
-                    thumbnail = child.child("thumbnail").getValue(Int::class.java) ?: 0
+                    categoryId = category.key ?: return@mapNotNull null,
+                    categoryName = category.child("categoryName").value.toString(),
+                    itemCount = category.child("products").childrenCount.toInt(),
+                    thumbnail = category.child("thumbnail").getValue(Int::class.java) ?: 0
                 )
             }
         }
     }
 
-    override fun getCategory(categoryName: String): Flow<Category?> {
-        return reference.child(categoryName).asFlow().map { snapshot ->
+    override fun getCategory(categoryId: String): Flow<Category?> {
+        return reference.child(categoryId).asFlow().map { category ->
             Category(
-                categoryName = categoryName,
-                itemCount = snapshot.childrenCount.toInt(),
-                thumbnail = snapshot.child("thumbnail").getValue(Int::class.java) ?: 0
+                categoryId = category.key ?: return@map null,
+                categoryName = category.child("categoryName").value.toString(),
+                itemCount = category.child("products").childrenCount.toInt(),
+                thumbnail = category.child("thumbnail").getValue(Int::class.java) ?: 0
             )
         }
     }
 
     override fun updateCategory(category: Category) {
-        // TODO - More difficult because the category name might have changed (see issue #10).
+        // TODO
     }
 
     override fun createCategory(category: Category) {
         val categoryKey = reference.push().key
         val categoryRef = reference.child(categoryKey!!)
-        categoryRef.setValue(true)
+        categoryRef.setValue(category)
         //reference.child(category.categoryName).setValue(true)
     }
 
-    override fun deleteCategory(categoryName: String) {
-        reference.child(categoryName).removeValue()
+    override fun deleteCategory(categoryId: String) {
+        reference.child(categoryId).removeValue()
     }
 }

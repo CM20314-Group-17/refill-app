@@ -9,9 +9,9 @@ class FakeCategoryRepository : CategoryRepository {
 
     val data = MutableStateFlow(
         value = listOf(
-            Category(categoryName = "Category 1", itemCount = 1),
-            Category(categoryName = "Category 2", itemCount = 2),
-            Category(categoryName = "Category 3", itemCount = 3),
+            Category(categoryId = "1", categoryName = "Category 1", itemCount = 1),
+            Category(categoryId = "2", categoryName = "Category 2", itemCount = 2),
+            Category(categoryId = "3", categoryName = "Category 3", itemCount = 3),
         )
     )
 
@@ -19,25 +19,27 @@ class FakeCategoryRepository : CategoryRepository {
         return data
     }
 
-    override fun getCategory(categoryName: String): Flow<Category?> {
+    override fun getCategory(categoryId: String): Flow<Category?> {
         return data.map { categories ->
-            categories.find { it.categoryName == categoryName }
+            categories.find { it.categoryId == categoryId }
         }
     }
 
     override fun updateCategory(category: Category) {
         data.value = data.value.map {
-            if (it.categoryName == category.categoryName) category else it
+            if (it.categoryId == category.categoryId) category else it
         }
     }
 
     override fun createCategory(category: Category) {
-        data.value = data.value.toMutableList().apply { add(category) }
+        data.value = data.value.toMutableList().apply {
+            add(category.copy(categoryId = UUID.randomUUID().toString()))
+        }
     }
 
-    override fun deleteCategory(categoryName: String) {
+    override fun deleteCategory(categoryId: String) {
         data.value = data.value.mapNotNull {
-            if (it.categoryName == categoryName) null else it
+            if (it.categoryId == categoryId) null else it
         }
     }
 }

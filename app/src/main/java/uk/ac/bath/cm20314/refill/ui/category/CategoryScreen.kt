@@ -28,10 +28,10 @@ import uk.ac.bath.cm20314.refill.ui.product.ProductDialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
-    categoryName: String,
+    categoryId: String,
     navigateToProduct: (Product) -> Unit,
     navigateBack: () -> Unit,
-    viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryName))
+    viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryId))
 ) {
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
@@ -111,7 +111,7 @@ fun CategoryScreen(
         heading = { Text(text = "Create product") },
         onClose = { createDialogOpen = false },
         onSave = viewModel::createProduct,
-        product = Product(categoryName = categoryName)
+        product = Product(categoryId = categoryId)
     )
 
     if (deleteDialogOpen) {

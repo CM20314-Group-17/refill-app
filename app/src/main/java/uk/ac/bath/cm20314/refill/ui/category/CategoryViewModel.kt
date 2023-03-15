@@ -12,7 +12,7 @@ import uk.ac.bath.cm20314.refill.data.product.ProductRepository
 import uk.ac.bath.cm20314.refill.data.product.defaultProductRepository
 
 class CategoryViewModel(
-    private val categoryName: String,
+    private val categoryId: String,
     private val categoryRepository: CategoryRepository,
     private val productRepository: ProductRepository
 ) : ViewModel() {
@@ -24,8 +24,8 @@ class CategoryViewModel(
     private val _events = Channel<Event>()
     val events = _events.receiveAsFlow()
 
-    val category = categoryRepository.getCategory(categoryName)
-    val products = productRepository.getProducts(categoryName)
+    val category = categoryRepository.getCategory(categoryId)
+    val products = productRepository.getProducts(categoryId)
 
     fun updateCategory(category: Category) {
         categoryRepository.updateCategory(category)
@@ -37,13 +37,13 @@ class CategoryViewModel(
     }
 
     fun deleteCategory() {
-        categoryRepository.deleteCategory(categoryName)
+        categoryRepository.deleteCategory(categoryId)
     }
 
-    class Factory(private val categoryName: String) : ViewModelProvider.Factory {
+    class Factory(private val categoryId: String) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>) =
-            CategoryViewModel(categoryName, defaultCategoryRepository, defaultProductRepository) as T
+            CategoryViewModel(categoryId, defaultCategoryRepository, defaultProductRepository) as T
     }
 }

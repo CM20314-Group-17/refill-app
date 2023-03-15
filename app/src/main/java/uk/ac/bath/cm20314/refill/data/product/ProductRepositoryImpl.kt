@@ -10,51 +10,51 @@ object ProductRepositoryImpl : ProductRepository {
     private val reference = FirebaseDatabase.getInstance().getReference("Categories")
 
     override fun getAllProducts(): Flow<List<Product>> {
-        return reference.asFlow().map { snapshot ->
-            snapshot.children.flatMap { category ->
-                category.children.mapNotNull { product ->
+        return reference.asFlow().map { categories ->
+            categories.children.flatMap { category ->
+                category.child("products").children.mapNotNull { product ->
                     product.getValue(Product::class.java)?.also {
-                        it.categoryName = category.key ?: return@mapNotNull null
-                        it.productName = product.key ?: return@mapNotNull null
+                        it.categoryId = category.key ?: return@mapNotNull null
+                        it.productId = product.key ?: return@mapNotNull null
                     }
                 }
             }
         }
     }
 
-    override fun getProducts(categoryName: String): Flow<List<Product>> {
-        return reference.child(categoryName).asFlow().map { snapshot ->
+    override fun getProducts(categoryId: String): Flow<List<Product>> {
+        return reference.child(categoryId).child("products").asFlow().map { snapshot ->
             snapshot.children.mapNotNull { child ->
                 child.getValue(Product::class.java)?.also {
-                    it.categoryName = categoryName
-                    it.productName = child.key ?: return@mapNotNull null
+                    it.categoryId = categoryId
+                    it.productId = child.key ?: return@mapNotNull null
                 }
             }
         }
     }
 
-    override fun getProduct(categoryName: String, productName: String): Flow<Product?> {
-        return reference.child(categoryName).child(productName).asFlow().map { snapshot ->
-            snapshot.getValue(Product::class.java)?.also {
-                it.categoryName = categoryName
-                it.productName = productName
+    override fun getProduct(categoryId: String, productId: String): Flow<Product?> {
+        return reference.child(categoryId).child("products").child(productId).asFlow().map { product ->
+            product.getValue(Product::class.java)?.also {
+                it.categoryId = categoryId
+                it.productId = productId
             }
         }
     }
 
     override fun updateProduct(product: Product) {
-        // TODO - More difficult because the product name might have changed (see issue #7).
+        // TODO
     }
 
     override fun createProduct(product: Product) {
-        val categoryRef = reference.child(product.categoryName)
-        val productKey = categoryRef.push().key
-        val productRef = categoryRef.child(productKey!!)
+        val categoryRef = reference.child(product.categoryId)
+        val productKey = categoryRef.child("products").push().key
+        val productRef = categoryRef.child("products").child(productKey!!)
         productRef.setValue(product)
         //reference.child(product.categoryName).child(product.productName).setValue(product)
     }
 
-    override fun deleteProduct(categoryName: String, productName: String) {
-        reference.child(categoryName).child(productName).removeValue()
+    override fun deleteProduct(categoryId: String, productId: String) {
+        reference.child(categoryId).child("products").child(productId).removeValue()
     }
 }

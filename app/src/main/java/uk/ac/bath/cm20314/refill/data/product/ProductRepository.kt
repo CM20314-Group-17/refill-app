@@ -10,10 +10,10 @@ interface ProductRepository {
     fun getAllProducts(): Flow<List<Product>>
 
     /** Gets the products in a particular category. */
-    fun getProducts(categoryName: String): Flow<List<Product>>
+    fun getProducts(categoryId: String): Flow<List<Product>>
 
     /** Gets the product in a particular category with a particular id. */
-    fun getProduct(categoryName: String, productName: String): Flow<Product?>
+    fun getProduct(categoryId: String, productId: String): Flow<Product?>
 
     /** Updates an existing product. */
     fun updateProduct(product: Product)
@@ -22,5 +22,5 @@ interface ProductRepository {
     fun createProduct(product: Product)
 
     /** Deletes an existing product. */
-    fun deleteProduct(categoryName: String, productName: String)
+    fun deleteProduct(categoryId: String, productId: String)
 }

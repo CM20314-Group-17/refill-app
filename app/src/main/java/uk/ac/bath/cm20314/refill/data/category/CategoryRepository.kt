@@ -10,7 +10,7 @@ interface CategoryRepository {
     fun getCategories(): Flow<List<Category>>
 
     /** Gets the category with a particular id. */
-    fun getCategory(categoryName: String): Flow<Category?>
+    fun getCategory(categoryId: String): Flow<Category?>
 
     /** Updates an existing category. */
     fun updateCategory(category: Category)
@@ -19,5 +19,5 @@ interface CategoryRepository {
     fun createCategory(category: Category)
 
     /** Deletes an existing category. */
-    fun deleteCategory(categoryName: String)
+    fun deleteCategory(categoryId: String)
 }

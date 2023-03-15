@@ -17,7 +17,7 @@ class ProductViewModelTest {
     @Before
     fun setup() {
         productRepository = FakeProductRepository()
-        viewModel = ProductViewModel("Category 1", "Product 1", productRepository)
+        viewModel = ProductViewModel("1", "1", productRepository)
     }
 
     @Test
