@@ -1,84 +1,60 @@
 package uk.ac.bath.cm20314.refill.data.product
 
-import android.content.ContentValues.TAG
-import android.util.Log
-import com.google.firebase.database.*
-
-private lateinit var database: DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import uk.ac.bath.cm20314.refill.data.asFlow
 
 object ProductRepositoryImpl : ProductRepository {
 
+    private val reference = FirebaseDatabase.getInstance().getReference("Categories")
 
-
-    override suspend fun getProducts(categoryId: String): List<Product> {
-        // TODO: Replace with products retrieved from the database.
-        return listOf(
-            Product(categoryName = "Pasta",productName = "Spaghetti", pricePerKg = 9, portionSize = 100f),
-            Product(categoryName = "Pasta",productName = "Pennette (White)", pricePerKg = 8, portionSize = 100f),
-            Product(categoryName = "Pasta",productName = "Pennette (Wholewheat)", pricePerKg = 9, portionSize = 100f),
-            Product(categoryName = "Pasta",productName = "Tagliatelle", pricePerKg = 5, portionSize = 100f),
-            Product(categoryName = "Pasta",productName = "Vermicelli Noodles", pricePerKg = 4, portionSize = 100f)
-        )
-    }
-
-
-    override suspend fun getProduct(productName: String, categoryName: String): Product? {//need category id too
-        database =FirebaseDatabase.getInstance().getReference("Categories")
-        database.child(categoryName).child(productName).child("0").get().addOnSuccessListener {
-            val name = it.child("name").value
-            val portionSize = it.child("portionSize").value
-            val pricePerKg = it.child("pricePerKg").value
-            val updated = it.child("updated").value
-            Log.i("firebase","Got value $pricePerKg")//Test to see if database can read
+    override fun getAllProducts(): Flow<List<Product>> {
+        return reference.asFlow().map { categories ->
+            categories.children.flatMap { category ->
+                category.child("products").children.mapNotNull { product ->
+                    product.getValue(Product::class.java)?.also {
+                        it.categoryId = category.key ?: return@mapNotNull null
+                        it.productId = product.key ?: return@mapNotNull null
+                    }
+                }
+            }
         }
-        return Product(categoryName = "Pasta",productName = "Vermicelli Noodles", pricePerKg = 4, portionSize = 100f)
     }
 
-    override suspend fun updateProduct(product: Product) {
-        deleteProduct(product.productName,product.categoryName)
-        createProduct(product.categoryName,product.productName,product.pricePerKg,product.portionSize,product.isUpdated)
-    }
-
-    override suspend fun createProduct(categoryName:String,productName: String, pricePerKg: Int, portionSize: Float, isUpdated: Boolean):Product? {
-        val database = FirebaseDatabase.getInstance()
-        val ref = database.getReference("Categories")
-        val query = ref.orderByKey().equalTo(categoryName)
-        val product = Product(categoryName,productName, pricePerKg, portionSize, isUpdated)
-
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (categorySnapshot in dataSnapshot.children) {
-                    val newRef = categorySnapshot.child(productName).ref
-                    val productValues = product.toMap().filterKeys { key -> key != "categoryName" }
-                    newRef.setValue(productValues)
-                    Log.d(TAG, "Item added")
+    override fun getProducts(categoryId: String): Flow<List<Product>> {
+        return reference.child(categoryId).child("products").asFlow().map { snapshot ->
+            snapshot.children.mapNotNull { child ->
+                child.getValue(Product::class.java)?.also {
+                    it.categoryId = categoryId
+                    it.productId = child.key ?: return@mapNotNull null
                 }
             }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e(TAG, "Error", databaseError.toException())
-            }
-        })
-        return product
+        }
     }
 
-
-    override suspend fun deleteProduct(productName: String, categoryName: String) {
-        val database = FirebaseDatabase.getInstance()
-        val ref = database.getReference("Categories")
-        val query = ref.orderByKey().equalTo(categoryName)
-
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (categorySnapshot in dataSnapshot.children) {
-                    val itemQuery = categorySnapshot.child(productName).ref
-                    itemQuery.removeValue()
-                }
+    override fun getProduct(categoryId: String, productId: String): Flow<Product?> {
+        return reference.child(categoryId).child("products").child(productId).asFlow().map { product ->
+            product.getValue(Product::class.java)?.also {
+                it.categoryId = categoryId
+                it.productId = productId
             }
+        }
+    }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e(TAG, "Error", databaseError.toException())
-            }
-        })
+    override fun updateProduct(product: Product) {
+        reference.child(product.categoryId).child("products").child(product.productId).setValue(product)
+    }
+
+    override fun createProduct(product: Product) {
+        val categoryRef = reference.child(product.categoryId)
+        val productKey = categoryRef.child("products").push().key
+        val productRef = categoryRef.child("products").child(productKey!!)
+        productRef.setValue(product)
+        //reference.child(product.categoryName).child(product.productName).setValue(product)
+    }
+
+    override fun deleteProduct(categoryId: String, productId: String) {
+        reference.child(categoryId).child("products").child(productId).removeValue()
     }
 }

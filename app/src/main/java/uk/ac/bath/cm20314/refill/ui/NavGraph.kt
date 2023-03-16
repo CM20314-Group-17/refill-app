@@ -28,14 +28,14 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         }
     }
     val navigateToCategory = { category: Category ->
-        navController.navigate(route = "category/${category.categoryName}") {
+        navController.navigate(route = "category/${category.categoryId}") {
             popUpTo(route = "category") {
                 inclusive = true
             }
         }
     }
     val navigateToProduct = { product: Product ->
-        navController.navigate(route = "product/${product.categoryName}/${product.productName}") {
+        navController.navigate(route = "product/${product.categoryId}/${product.productId}") {
             popUpTo(route = "product") {
                 inclusive = true
             }
@@ -73,25 +73,25 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
         composable(
-            route = "category/{categoryName}",
-            arguments = listOf(navArgument(name = "categoryName") { type = NavType.StringType })
+            route = "category/{categoryId}",
+            arguments = listOf(navArgument(name = "categoryId") { type = NavType.StringType })
         ) { backStackEntry ->
             CategoryScreen(
-                categoryName = backStackEntry.arguments?.getString("categoryName")!!,
+                categoryId = backStackEntry.arguments?.getString("categoryId")!!,
                 navigateToProduct = navigateToProduct,
                 navigateBack = navigateBack
             )
         }
         composable(
-            route = "product/{categoryName}/{productName}",
+            route = "product/{categoryId}/{productId}",
             arguments = listOf(
-                navArgument(name = "categoryName") { type = NavType.StringType },
-                navArgument(name = "productName") { type = NavType.StringType }
+                navArgument(name = "categoryId") { type = NavType.StringType },
+                navArgument(name = "productId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             ProductScreen(
-                categoryName = backStackEntry.arguments?.getString("categoryName")!!,
-                productName = backStackEntry.arguments?.getString("productName")!!,
+                categoryId = backStackEntry.arguments?.getString("categoryId")!!,
+                productId = backStackEntry.arguments?.getString("productId")!!,
                 navigateBack = navigateBack
             )
         }

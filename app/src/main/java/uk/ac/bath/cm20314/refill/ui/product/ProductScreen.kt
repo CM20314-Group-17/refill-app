@@ -1,9 +1,7 @@
 package uk.ac.bath.cm20314.refill.ui.product
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -14,36 +12,29 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.nfc.LocalNfc
+import uk.ac.bath.cm20314.refill.data.product.Product
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
+import uk.ac.bath.cm20314.refill.ui.common.Thumbnail
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(
-    categoryName: String,
-    productName: String,
+    categoryId: String,
+    productId: String,
     navigateBack: () -> Unit,
-    viewModel: ProductViewModel = viewModel(
-        factory = ProductViewModel.Factory(
-            categoryName,
-            productName
-        )
-    )
+    viewModel: ProductViewModel = viewModel(factory = ProductViewModel.Factory(categoryId, productId))
 ) {
-    val product by viewModel.product.collectAsState()
+    val product by viewModel.product.collectAsState(initial = null)
 
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
@@ -75,7 +66,7 @@ fun ProductScreen(
     RefillLayout(
         topBar = { scrollBehaviour ->
             ProductTopBar(
-                productName = productName,
+                productName = product?.productName ?: "",
                 editProduct = { editDialogOpen = true },
                 onDeleteProduct = { deleteDialogOpen = true },
                 navigateBack = navigateBack,
@@ -106,15 +97,14 @@ fun ProductScreen(
         snackbarHostState = snackbarHostState
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            // TODO: Display image rather than a block colour.
-            Box(
+            Thumbnail(
+                thumbnail = product?.thumbnail ?: 0,
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary)
             )
             Column(modifier = Modifier.padding(16.dp)) {
-                val price = product?.let { it.pricePerKg.toFloat() / 100 } ?: 0
+                val price = product?.let { it.pricePerKg.toFloat() / 100 } ?: 0f
                 val portion = product?.portionSize?.roundToInt()
                 val changes = product?.isUpdated == false
 
@@ -158,27 +148,19 @@ fun ProductScreen(
         }
     }
 
-    if (editDialogOpen) {
-        val name = (product?.productName ?: "").toString()
-        val price = (product?.let { it.pricePerKg.toFloat() } ?: 0).toInt()
-        val portion = (product?.portionSize?.roundToInt() ?: 0f).toFloat()
-
-        EditProductDialog(
-            onSave = viewModel::updateProduct,
-            onClose = { editDialogOpen = false },
-            originalName = name,
-            originalPPK = price,
-            originalPortion = portion,
-        )
-    }
+    ProductDialog(
+        visible = editDialogOpen,
+        heading = { Text(text = "Edit product") },
+        onClose = { editDialogOpen = false },
+        onSave = viewModel::updateProduct,
+        product = product ?: Product()
+    )
 
     if (deleteDialogOpen) {
         DeleteProductDialog(
             onDelete = {
-                coroutineScope.launch {
-                    viewModel.deleteProduct().join()
-                    navigateBack()
-                }
+                viewModel.deleteProduct()
+                navigateBack()
             },
             onClose = { deleteDialogOpen = false }
         )
@@ -257,92 +239,6 @@ private fun ProductTopBar(
             }
         },
         scrollBehavior = scrollBehaviour
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun EditProductDialog(
-    onSave: (String, Int, Float) -> Unit,
-    onClose: () -> Unit,
-    originalName: String,
-    originalPPK: Int,
-    originalPortion: Float,
-) {
-    var productName by rememberSaveable { mutableStateOf(value = originalName) }
-    var productPPK by rememberSaveable { mutableStateOf(value = originalPPK.toString()) }
-    var productPortion by rememberSaveable { mutableStateOf(value = originalPortion.toString()) }
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        awaitFrame()
-        focusRequester.requestFocus()
-    }
-
-    AlertDialog(
-        title = { Text(text = "Edit Product") },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onSave(productName.ifEmpty{ originalName },
-                        productPPK.toIntOrNull() ?: originalPPK,
-                        productPortion.toFloatOrNull() ?: originalPortion )
-                    onClose()
-                    productName = originalName
-                    productPPK = originalPPK.toString()
-                    productPortion = originalPortion.toString()
-                }
-            ) {
-                Text(text = "Save")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onClose()
-                    productName = originalName
-                    productPPK = originalPPK.toString()
-                    productPortion = originalPortion.toString()
-                }
-            ) {
-                Text(text = "Cancel")
-            }
-        },
-        text = {
-            Column {
-                Text(text = "Edit product details.")
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                    label = { Text(text = stringResource(R.string.product_name)) },
-                    value = productName,
-                    onValueChange = { productName = it },
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    label = { Text(text = stringResource(R.string.product_price_label)) },
-                    value = productPPK,
-                    onValueChange = { productPPK = it },
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    label = { Text(text = stringResource(R.string.product_portion_size)) },
-                    value = productPortion,
-                    onValueChange = { productPortion = it },
-                    singleLine = true
-                )
-            }
-        },
-        onDismissRequest = onClose
     )
 }
 

@@ -1,6 +1,5 @@
 package uk.ac.bath.cm20314.refill.ui.categories
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -11,19 +10,18 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
+import uk.ac.bath.cm20314.refill.ui.category.CategoryDialog
 import uk.ac.bath.cm20314.refill.ui.common.RefillCard
 import uk.ac.bath.cm20314.refill.ui.common.RefillList
+import uk.ac.bath.cm20314.refill.ui.common.Thumbnail
 
 /** Displays a list of product categories. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -35,11 +33,9 @@ fun CategoriesScreen(
     viewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
     var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-    val categories by viewModel.categories.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.loadCategories()
         viewModel.events.collectLatest { event ->
             when (event) {
                 CategoriesViewModel.Event.CategoryCreated -> {
@@ -49,7 +45,7 @@ fun CategoriesScreen(
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.undoCreateCategory()
+                        TODO()
                     }
                 }
             }
@@ -77,6 +73,8 @@ fun CategoriesScreen(
         },
         snackbarHostState = snackbarHostState
     ) {
+        val categories by viewModel.categories.collectAsState(initial = emptyList())
+
         RefillList(items = categories) { category ->
             RefillCard(
                 title = category.categoryName,
@@ -87,23 +85,23 @@ fun CategoriesScreen(
                 ),
                 onClick = { navigateToCategory(category) }
             ) {
-                // TODO: Display image rather than a block colour.
-                Box(
+                Thumbnail(
+                    thumbnail = category.thumbnail,
                     modifier = Modifier
                         .height(100.dp)
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primary)
                 )
             }
         }
     }
 
-    if (createDialogOpen) {
-        CreateCategoryDialog(
-            createCategory = viewModel::createCategory,
-            onClose = { createDialogOpen = false }
-        )
-    }
+    CategoryDialog(
+        visible = createDialogOpen,
+        heading = { Text(text = "Create category") },
+        onClose = { createDialogOpen = false },
+        onSave = viewModel::createCategory,
+        category = Category()
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -133,63 +131,5 @@ private fun CategoriesTopBar(
             }
         },
         scrollBehavior = scrollBehaviour
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CreateCategoryDialog(
-    createCategory: (name: String) -> Unit,
-    onClose: () -> Unit,
-) {
-    var categoryName by rememberSaveable { mutableStateOf(value = "") }
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        awaitFrame()
-        focusRequester.requestFocus()
-    }
-
-    AlertDialog(
-        title = { Text(text = stringResource(R.string.category_new)) },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    createCategory(categoryName)
-                    onClose()
-                    categoryName = ""
-                }
-            ) {
-                Text(text = "Save")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onClose()
-                    categoryName = ""
-                }
-            ) {
-                Text(text = "Cancel")
-            }
-        },
-        text = {
-            Column {
-                Text(text = "Create a new product category.")
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .focusRequester(focusRequester),
-                    label = { Text(text = stringResource(R.string.category_name)) },
-                    value = categoryName,
-                    onValueChange = { categoryName = it },
-                    singleLine = true
-                )
-            }
-        },
-        onDismissRequest = {
-            onClose()
-            categoryName = ""
-        }
     )
 }

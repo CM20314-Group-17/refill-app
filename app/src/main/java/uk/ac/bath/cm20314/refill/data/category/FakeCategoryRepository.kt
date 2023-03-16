@@ -1,36 +1,45 @@
 package uk.ac.bath.cm20314.refill.data.category
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import java.util.*
+
 object FakeCategoryRepository : CategoryRepository {
 
-    var data = mutableListOf(
-        Category(categoryName = "Category 1", itemCount = 1, isUpdated = true),
-        Category(categoryName = "Category 2", itemCount = 2, isUpdated = true),
-        Category(categoryName = "Category 3", itemCount = 3, isUpdated = true),
-        Category(categoryName = "Category 4", itemCount = 4, isUpdated = true),
-        Category(categoryName = "Category 5", itemCount = 5, isUpdated = true),
-        Category(categoryName = "Category 6", itemCount = 6, isUpdated = true),
+    val data = MutableStateFlow(
+        value = listOf(
+            Category(categoryId = "1", categoryName = "Category 1", itemCount = 1),
+            Category(categoryId = "2", categoryName = "Category 2", itemCount = 2),
+            Category(categoryId = "3", categoryName = "Category 3", itemCount = 3),
+        )
     )
 
-    override suspend fun getCategories(): List<Category> {
-        return data.map { it.copy() }
+    override fun getCategories(): Flow<List<Category>> {
+        return data
     }
 
-    override suspend fun getCategory(categoryName: String): Category? {
-        return data.find { it.categoryName == categoryName }
-    }
-
-    override suspend fun updateCategory(category: Category, name: String) {
-        getCategory(category.categoryName)?.apply {
-            categoryName = name
-            isUpdated = category.isUpdated
+    override fun getCategory(categoryId: String): Flow<Category?> {
+        return data.map { categories ->
+            categories.find { it.categoryId == categoryId }
         }
     }
 
-    override suspend fun createCategory(categoryName: String): Category {
-        return Category(categoryName = categoryName, itemCount = 0).also { data.add(it) }
+    override fun updateCategory(category: Category) {
+        data.value = data.value.map {
+            if (it.categoryId == category.categoryId) category else it
+        }
     }
 
-    override suspend fun deleteCategory(categoryName: String) {
-        data.removeIf { it.categoryName == categoryName }
+    override fun createCategory(category: Category) {
+        data.value = data.value.toMutableList().apply {
+            add(category.copy(categoryId = UUID.randomUUID().toString()))
+        }
+    }
+
+    override fun deleteCategory(categoryId: String) {
+        data.value = data.value.mapNotNull {
+            if (it.categoryId == categoryId) null else it
+        }
     }
 }

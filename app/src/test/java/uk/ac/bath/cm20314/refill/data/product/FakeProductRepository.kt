@@ -1,41 +1,52 @@
 package uk.ac.bath.cm20314.refill.data.product
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import java.util.*
+
 class FakeProductRepository : ProductRepository {
 
-    val data = mutableListOf(
-        Product(categoryName = "Category 1", productName = "Product 1", pricePerKg = 1, portionSize = 1f, isUpdated = true),
-        Product(categoryName = "Category 1", productName = "Product 2", pricePerKg = 2, portionSize = 2f, isUpdated = true),
-        Product(categoryName = "Category 1", productName = "Product 3", pricePerKg = 3, portionSize = 3f, isUpdated = true)
+    val data = MutableStateFlow(
+        value = listOf(
+            Product(categoryId = "1", productId = "1", productName = "Product 1", pricePerKg = 1, portionSize = 1f),
+            Product(categoryId = "1", productId = "2", productName = "Product 2", pricePerKg = 2, portionSize = 2f),
+            Product(categoryId = "1", productId = "3", productName = "Product 3", pricePerKg = 3, portionSize = 3f),
+        )
     )
 
-    override suspend fun getProducts(categoryName: String): List<Product> {
-        return data.filter { it.categoryName == categoryName }.map { it.copy() }
+    override fun getAllProducts(): Flow<List<Product>> {
+        return data
     }
 
-    override suspend fun getProduct(productName: String, categoryName: String): Product? {
-        return data.find { it.categoryName == categoryName && it.productName == productName }
-    }
-
-    override suspend fun updateProduct(product: Product) {
-        getProduct(product.productName, product.categoryName)?.apply {
-            productName = product.productName
-            pricePerKg = product.pricePerKg
-            portionSize = product.portionSize
-            isUpdated = false
+    override fun getProducts(categoryId: String): Flow<List<Product>> {
+        return data.map { products ->
+            products.filter { it.categoryId == categoryId }
         }
     }
 
-    override suspend fun createProduct(
-        categoryName: String,
-        productName: String,
-        pricePerKg: Int,
-        portionSize: Float,
-        isUpdated: Boolean
-    ): Product {
-        return Product(categoryName, productName, pricePerKg, portionSize).also { data.add(it) }
+    override fun getProduct(categoryId: String, productId: String): Flow<Product?> {
+        return data.map { products ->
+            products.find { it.categoryId == categoryId && it.productId == productId }
+        }
     }
 
-    override suspend fun deleteProduct(productName: String, categoryName: String) {
-        data.removeIf { it.categoryName == categoryName && it.productName == productName }
+    override fun updateProduct(product: Product) {
+        product.isUpdated = false
+        data.value = data.value.map {
+            if (it.categoryId == product.categoryId && it.productId == product.productId) product else it
+        }
+    }
+
+    override fun createProduct(product: Product) {
+        data.value = data.value.toMutableList().apply {
+            add(product.copy(productId = UUID.randomUUID().toString()))
+        }
+    }
+
+    override fun deleteProduct(categoryId: String, productId: String) {
+        data.value = data.value.mapNotNull {
+            if (it.categoryId == categoryId && it.productId == productId) null else it
+        }
     }
 }

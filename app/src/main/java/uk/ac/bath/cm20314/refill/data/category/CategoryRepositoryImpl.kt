@@ -1,56 +1,52 @@
 package uk.ac.bath.cm20314.refill.data.category
 
-import android.content.ContentValues
-import android.util.Log
-import com.google.firebase.database.*
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import uk.ac.bath.cm20314.refill.data.asFlow
 
-private lateinit var database: DatabaseReference
 object CategoryRepositoryImpl : CategoryRepository {
 
+    private val reference = FirebaseDatabase.getInstance().getReference("Categories")
 
-    override suspend fun getCategories(): List<Category> {
-        // TODO: Replace with categories retrieved from the database.
-        return listOf(
-            Category(categoryName = "Dried Fruits", itemCount = 9),
-            Category(categoryName = "Pasta", itemCount = 8),
-            Category(categoryName = "Nuts & Seeds", itemCount = 9),
-            Category(categoryName = "Rice", itemCount = 5),
-            Category(categoryName = "Beans", itemCount = 4)
-        )
-    }
-
-    override suspend fun getCategory(categoryName: String): Category? {
-        TODO()
-    }
-
-    override suspend fun updateCategory(category: Category, name: String) {
-        TODO()
-    }
-
-    override suspend fun createCategory(categoryName: String): Category {
-        val database = FirebaseDatabase.getInstance()
-        val ref = database.getReference("Categories")
-        val category = Category(categoryName = categoryName, itemCount = 0, isUpdated = true)
-        val newRef = ref.child(categoryName)
-        newRef.setValue(category)
-        return category
-    }
-
-    override suspend fun deleteCategory(categoryName: String) {
-        val database = FirebaseDatabase.getInstance()
-        val ref = database.getReference("Categories")
-        val query = ref.orderByKey().equalTo(categoryName)
-
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (categorySnapshot in dataSnapshot.children) {
-                    categorySnapshot.ref.removeValue()
-                }
+    override fun getCategories(): Flow<List<Category>> {
+        return reference.asFlow().map { categories ->
+            categories.children.mapNotNull { category ->
+                Category(
+                    categoryId = category.key ?: return@mapNotNull null,
+                    categoryName = category.child("categoryName").value.toString(),
+                    itemCount = category.child("products").childrenCount.toInt(),
+                    thumbnail = category.child("thumbnail").getValue(Int::class.java) ?: 0
+                )
             }
+        }
+    }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e(ContentValues.TAG, "Error", databaseError.toException())
-            }
-        })
+    override fun getCategory(categoryId: String): Flow<Category?> {
+        return reference.child(categoryId).asFlow().map { category ->
+            Category(
+                categoryId = category.key ?: return@map null,
+                categoryName = category.child("categoryName").value.toString(),
+                itemCount = category.child("products").childrenCount.toInt(),
+                thumbnail = category.child("thumbnail").getValue(Int::class.java) ?: 0
+            )
+        }
     }
+
+    override fun updateCategory(category: Category) {
+        val categoryReference = reference.child(category.categoryId)
+        categoryReference.child("categoryName").setValue(category.categoryName)
+        categoryReference.child("thumbnail").setValue(category.thumbnail)
     }
+
+    override fun createCategory(category: Category) {
+        val categoryKey = reference.push().key
+        val categoryRef = reference.child(categoryKey!!)
+        categoryRef.setValue(category)
+        //reference.child(category.categoryName).setValue(true)
+    }
+
+    override fun deleteCategory(categoryId: String) {
+        reference.child(categoryId).removeValue()
+    }
+}
