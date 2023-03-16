@@ -34,7 +34,9 @@ object CategoryRepositoryImpl : CategoryRepository {
     }
 
     override fun updateCategory(category: Category) {
-        // TODO
+        val categoryReference = reference.child(category.categoryId)
+        categoryReference.child("categoryName").setValue(category.categoryName)
+        categoryReference.child("thumbnail").setValue(category.thumbnail)
     }
 
     override fun createCategory(category: Category) {

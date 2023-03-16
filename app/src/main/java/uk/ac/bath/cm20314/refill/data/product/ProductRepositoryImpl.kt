@@ -43,7 +43,7 @@ object ProductRepositoryImpl : ProductRepository {
     }
 
     override fun updateProduct(product: Product) {
-        // TODO
+        reference.child(product.categoryId).child("products").child(product.productId).setValue(product)
     }
 
     override fun createProduct(product: Product) {
