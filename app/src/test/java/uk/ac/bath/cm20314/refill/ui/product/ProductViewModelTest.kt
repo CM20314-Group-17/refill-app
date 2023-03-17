@@ -24,4 +24,17 @@ class ProductViewModelTest {
     fun testLoadProduct() = runTest {
         assertEquals(productRepository.data.value[0], viewModel.product.first())
     }
+
+    @Test
+    fun testUpdateProduct() = runTest {
+        viewModel.updateProduct(viewModel.product.first()!!.copy(productName = "Updated"))
+        assertEquals("Updated", productRepository.data.value[0].productName)
+        assertEquals("Updated", viewModel.product.first()?.productName)
+    }
+
+    @Test
+    fun testDeleteProduct() = runTest {
+        viewModel.deleteProduct()
+        assertNull(productRepository.data.value.find { it.productName == "Product 1" })
+    }
 }

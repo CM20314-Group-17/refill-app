@@ -37,7 +37,7 @@ class CategoryViewModelTest {
 
     @Test
     fun testUpdateCategory() = runTest {
-        viewModel.updateCategory(Category(categoryId = "1", categoryName = "Updated"))
+        viewModel.updateCategory(viewModel.category.first()!!.copy(categoryName = "Updated"))
         assertEquals("Updated", categoryRepository.data.value[0].categoryName)
         assertEquals("Updated", viewModel.category.first()?.categoryName)
     }
@@ -50,7 +50,7 @@ class CategoryViewModelTest {
 
     @Test
     fun testCreateProduct() = runTest {
-        viewModel.createProduct(Product(categoryId = "1", productName = "Product 4"))
+        viewModel.createProduct(Product(viewModel.category.first()!!.categoryId, productName = "Product 4"))
         assertEquals("Product 4", productRepository.data.value.last().productName)
         assertEquals("Product 4", viewModel.products.first().last().productName)
     }
