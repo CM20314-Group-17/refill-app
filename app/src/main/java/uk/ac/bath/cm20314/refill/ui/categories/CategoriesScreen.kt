@@ -14,7 +14,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
@@ -32,25 +31,8 @@ fun CategoriesScreen(
     navigateToSearch: () -> Unit,
     viewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
+    val categories by viewModel.categories.collectAsState(initial = emptyList())
     var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        viewModel.events.collectLatest { event ->
-            when (event) {
-                CategoriesViewModel.Event.CategoryCreated -> {
-                    val result = snackbarHostState.showSnackbar(
-                        message = "Category created",
-                        actionLabel = "Undo",
-                        duration = SnackbarDuration.Short
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        TODO()
-                    }
-                }
-            }
-        }
-    }
 
     RefillLayout(
         topBar = { scrollBehaviour ->
@@ -70,11 +52,8 @@ fun CategoriesScreen(
                     contentDescription = stringResource(R.string.categories_add)
                 )
             }
-        },
-        snackbarHostState = snackbarHostState
+        }
     ) {
-        val categories by viewModel.categories.collectAsState(initial = emptyList())
-
         RefillList(items = categories) { category ->
             RefillCard(
                 title = category.categoryName,

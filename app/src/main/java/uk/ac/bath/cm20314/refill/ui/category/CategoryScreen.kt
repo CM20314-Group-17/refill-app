@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.product.Product
@@ -33,31 +32,12 @@ fun CategoryScreen(
     navigateBack: () -> Unit,
     viewModel: CategoryViewModel = viewModel(factory = CategoryViewModel.Factory(categoryId))
 ) {
-    var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-    var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-    var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-
     val products by viewModel.products.collectAsState(initial = emptyList())
     val category by viewModel.category.collectAsState(initial = null)
 
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        viewModel.events.collectLatest { event ->
-            when (event) {
-                CategoryViewModel.Event.CategoryUpdated -> {
-                    val result = snackbarHostState.showSnackbar(
-                        message = "Category renamed",
-                        actionLabel = "Undo",
-                        duration = SnackbarDuration.Short
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        TODO()
-                    }
-                }
-            }
-        }
-    }
+    var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
+    var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
+    var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
 
     RefillLayout(
         topBar = { scrollBehaviour ->
@@ -79,8 +59,7 @@ fun CategoryScreen(
                     contentDescription = stringResource(R.string.category_add)
                 )
             }
-        },
-        snackbarHostState = snackbarHostState
+        }
     ) {
         RefillList(items = products) { product ->
             RefillCard(

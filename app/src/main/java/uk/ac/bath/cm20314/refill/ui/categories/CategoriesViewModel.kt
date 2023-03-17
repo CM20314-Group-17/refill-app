@@ -13,19 +13,10 @@ class CategoriesViewModel(
     private val repository: CategoryRepository
 ) : ViewModel() {
 
-    enum class Event {
-        CategoryCreated
-    }
-
-    private val _events = Channel<Event>()
-    val events = _events.receiveAsFlow()
-
     val categories = repository.getCategories()
 
-    /** Creates a new category with a particular name. */
     fun createCategory(category: Category) {
         repository.createCategory(category)
-        _events.trySend(Event.CategoryCreated)
     }
 
     companion object {

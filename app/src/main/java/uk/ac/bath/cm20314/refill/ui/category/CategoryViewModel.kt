@@ -17,19 +17,11 @@ class CategoryViewModel(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    enum class Event {
-        CategoryUpdated
-    }
-
-    private val _events = Channel<Event>()
-    val events = _events.receiveAsFlow()
-
     val category = categoryRepository.getCategory(categoryId)
     val products = productRepository.getProducts(categoryId)
 
     fun updateCategory(category: Category) {
         categoryRepository.updateCategory(category)
-        _events.trySend(Event.CategoryUpdated)
     }
 
     fun createProduct(product: Product) {

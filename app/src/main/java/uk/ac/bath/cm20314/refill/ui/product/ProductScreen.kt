@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.nfc.LocalNfc
@@ -38,30 +37,10 @@ fun ProductScreen(
 
     var editDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+    var nfcDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     val nfcCoroutineScope = rememberCoroutineScope()
     val nfcRepository = LocalNfc.current
-    var nfcDialogOpen by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        viewModel.events.collectLatest { event ->
-            when (event) {
-                ProductViewModel.Event.ProductUpdated -> {
-                    val result = snackbarHostState.showSnackbar(
-                        message = "Product renamed",
-                        actionLabel = "Undo",
-                        duration = SnackbarDuration.Short
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        TODO()
-                    }
-                }
-            }
-        }
-    }
 
     RefillLayout(
         topBar = { scrollBehaviour ->
@@ -93,8 +72,7 @@ fun ProductScreen(
                 },
                 elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
             )
-        },
-        snackbarHostState = snackbarHostState
+        }
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Thumbnail(

@@ -14,34 +14,10 @@ class ProductViewModel(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    enum class Event {
-        ProductUpdated
-    }
-
-    private val _events = Channel<Event>()
-    val events = _events.receiveAsFlow()
-
     val product = productRepository.getProduct(categoryId, productId)
-
-    private var previousName: String? = null
-    private var previousPPK: Int? = null
-    private var previousPortion: Float? = null
 
     fun updateProduct(product: Product) {
         productRepository.updateProduct(product)
-        // TODO: Add undo back in with new repository.
-//        viewModelScope.launch {
-//            _product.update { product ->
-//                previousName = product?.productName
-//                previousPPK = product?.pricePerKg
-//                previousPortion = product?.portionSize
-//                product?.copy(productName = name,
-//                              pricePerKg = ppk,
-//                              portionSize = portion) ?: product
-//            }
-//            _product.value?.let { productRepository.updateProduct(it) }
-//            _events.send(Event.ProductUpdated)
-//        }
     }
 
     fun deleteProduct() {
