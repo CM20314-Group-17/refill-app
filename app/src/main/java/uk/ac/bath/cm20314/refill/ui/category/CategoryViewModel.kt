@@ -2,8 +2,10 @@ package uk.ac.bath.cm20314.refill.ui.category
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.category.CategoryRepository
 import uk.ac.bath.cm20314.refill.data.category.defaultCategoryRepository
@@ -17,6 +19,9 @@ class CategoryViewModel(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
+    private val channel = Channel<String>()
+
+    val messages = channel.receiveAsFlow()
     val category = categoryRepository.getCategory(categoryId)
     val products = productRepository.getProducts(categoryId)
 
@@ -25,7 +30,13 @@ class CategoryViewModel(
     }
 
     fun createProduct(product: Product) {
-        productRepository.createProduct(product)
+        viewModelScope.launch {
+            productRepository.createProduct(product).also { success ->
+                if (!success) {
+                    channel.send("Product already exists")
+                }
+            }
+        }
     }
 
     fun deleteCategory() {

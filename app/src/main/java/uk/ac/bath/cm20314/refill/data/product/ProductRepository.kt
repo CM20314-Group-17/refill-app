@@ -19,7 +19,7 @@ interface ProductRepository {
     fun updateProduct(product: Product)
 
     /** Creates a new product. */
-    fun createProduct(product: Product)
+    suspend fun createProduct(product: Product): Boolean
 
     /** Deletes an existing product. */
     fun deleteProduct(categoryId: String, productId: String)
