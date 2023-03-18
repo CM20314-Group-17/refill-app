@@ -25,6 +25,9 @@ class CategoryViewModel(
     }
 
     fun createProduct(product: Product) {
+        if (product.productName.isBlank()) {
+            return
+        }
         productRepository.createProduct(product)
     }
 
