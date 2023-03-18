@@ -64,7 +64,6 @@ object ProductRepositoryImpl : ProductRepository {
                         return
                     }
                 }
-
                 val productKey = productRef.push().key
                 val newProductRef = productRef.child(productKey!!)
                 newProductRef.setValue(product)
