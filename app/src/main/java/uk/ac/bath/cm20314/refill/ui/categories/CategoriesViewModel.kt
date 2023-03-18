@@ -16,6 +16,9 @@ class CategoriesViewModel(
     val categories = repository.getCategories()
 
     fun createCategory(category: Category) {
+        if (category.categoryName.isBlank()) {
+            return
+        }
         repository.createCategory(category)
     }
 
