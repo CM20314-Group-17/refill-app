@@ -14,6 +14,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.ui.RefillLayout
@@ -33,6 +34,13 @@ fun CategoriesScreen(
 ) {
     val categories by viewModel.categories.collectAsState(initial = emptyList())
     var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.messages.collectLatest { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+    }
 
     RefillLayout(
         topBar = { scrollBehaviour ->
@@ -52,7 +60,8 @@ fun CategoriesScreen(
                     contentDescription = stringResource(R.string.categories_add)
                 )
             }
-        }
+        },
+        snackbarHostState = snackbarHostState
     ) {
         RefillList(items = categories) { category ->
             RefillCard(
