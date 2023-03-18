@@ -1,6 +1,5 @@
 package uk.ac.bath.cm20314.refill.data
 
-import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference

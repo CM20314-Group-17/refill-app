@@ -38,10 +38,11 @@ object FakeProductRepository : ProductRepository {
         }
     }
 
-    override fun createProduct(product: Product) {
+    override suspend fun createProduct(product: Product): Boolean {
         data.value = data.value.toMutableList().apply {
             add(product.copy(productId = UUID.randomUUID().toString()))
         }
+        return true
     }
 
     override fun deleteProduct(categoryId: String, productId: String) {

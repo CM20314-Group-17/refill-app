@@ -1,10 +1,8 @@
 package uk.ac.bath.cm20314.refill.data.product
 
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import uk.ac.bath.cm20314.refill.data.asFlow
 
@@ -49,35 +47,46 @@ object ProductRepositoryImpl : ProductRepository {
         reference.child(product.categoryId).child("products").child(product.productId).setValue(product)
     }
 
-    override fun createProduct(product: Product) {// i dont know how flow thing works so ye
-        val categoryRef = reference.child(product.categoryId)
-        //val productKey = categoryRef.child("products").push().key OLD CODE
-        //val productRef = categoryRef.child("products").child(productKey!!) OLD CODE
-        val productRef = categoryRef.child("products")
+    override suspend fun createProduct(product: Product): Boolean {
+        val productsRef = reference.child(product.categoryId).child("products")
+        val products = getProducts(product.categoryId).first()
 
-        productRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (productSnapshot in snapshot.children) {
-                    val existingProduct = productSnapshot.getValue(Product::class.java)
-                    if (existingProduct?.productName == product.productName) {
-                        //message here
-                        return
-                    }
-                }
-                val productKey = productRef.push().key
-                val newProductRef = productRef.child(productKey!!)
-                newProductRef.setValue(product)
-                //maybe add some message here
-            }
+        if (products.any { it.productName == product.productName }) {
+            return false
+        }
 
-            override fun onCancelled(error: DatabaseError) {
-                //add some error message here
-            }
-        })
+        productsRef.push().setValue(product)
+        return true
 
-
-        //productRef.setValue(product) OLD CODE
-        //reference.child(product.categoryName).child(product.productName).setValue(product) OLD CODE
+//        val categoryRef = reference.child(product.categoryId)
+//        //val productKey = categoryRef.child("products").push().key OLD CODE
+//        //val productRef = categoryRef.child("products").child(productKey!!) OLD CODE
+//        val productRef = categoryRef.child("products")
+//
+//        productRef.addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                for (productSnapshot in snapshot.children) {
+//                    val existingProduct = productSnapshot.getValue(Product::class.java)
+//                    if (existingProduct?.productName == product.productName) {
+//                        //message here
+//                        return
+//                    }
+//                }
+//
+//                val productKey = productRef.push().key
+//                val newProductRef = productRef.child(productKey!!)
+//                newProductRef.setValue(product)
+//                //maybe add some message here
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                //add some error message here
+//            }
+//        })
+//        return true
+//
+//        productRef.setValue(product) OLD CODE
+//        reference.child(product.categoryName).child(product.productName).setValue(product) OLD CODE
     }
 
     override fun deleteProduct(categoryId: String, productId: String) {
