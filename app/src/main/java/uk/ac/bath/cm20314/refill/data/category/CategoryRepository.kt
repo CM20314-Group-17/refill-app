@@ -16,7 +16,7 @@ interface CategoryRepository {
     fun updateCategory(category: Category)
 
     /** Creates a new category. */
-    fun createCategory(category: Category)
+    suspend fun createCategory(category: Category): Boolean
 
     /** Deletes an existing category. */
     fun deleteCategory(categoryId: String)

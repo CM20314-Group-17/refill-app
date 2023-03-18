@@ -39,11 +39,13 @@ object CategoryRepositoryImpl : CategoryRepository {
         categoryReference.child("thumbnail").setValue(category.thumbnail)
     }
 
-    override fun createCategory(category: Category) {
+    override suspend fun createCategory(category: Category): Boolean {
         val categoryKey = reference.push().key
         val categoryRef = reference.child(categoryKey!!)
         categoryRef.setValue(category)
         //reference.child(category.categoryName).setValue(true)
+
+        return true
     }
 
     override fun deleteCategory(categoryId: String) {
