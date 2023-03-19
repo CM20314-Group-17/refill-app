@@ -57,36 +57,6 @@ object ProductRepositoryImpl : ProductRepository {
 
         productsRef.push().setValue(product)
         return true
-
-//        val categoryRef = reference.child(product.categoryId)
-//        //val productKey = categoryRef.child("products").push().key OLD CODE
-//        //val productRef = categoryRef.child("products").child(productKey!!) OLD CODE
-//        val productRef = categoryRef.child("products")
-//
-//        productRef.addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                for (productSnapshot in snapshot.children) {
-//                    val existingProduct = productSnapshot.getValue(Product::class.java)
-//                    if (existingProduct?.productName == product.productName) {
-//                        //message here
-//                        return
-//                    }
-//                }
-//
-//                val productKey = productRef.push().key
-//                val newProductRef = productRef.child(productKey!!)
-//                newProductRef.setValue(product)
-//                //maybe add some message here
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                //add some error message here
-//            }
-//        })
-//        return true
-//
-//        productRef.setValue(product) OLD CODE
-//        reference.child(product.categoryName).child(product.productName).setValue(product) OLD CODE
     }
 
     override fun deleteProduct(categoryId: String, productId: String) {

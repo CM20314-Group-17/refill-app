@@ -30,15 +30,13 @@ class CategoryViewModel(
     }
 
     fun createProduct(product: Product) {
-        if (product.productName.isBlank()) {
-            return
-        }
         viewModelScope.launch {
-            productRepository.createProduct(product).also { success ->
-                if (!success) {
-                    channel.send("Product already exists")
-                }
+            val message = when {
+                product.productName.isBlank() -> "Product must have a name"
+                !productRepository.createProduct(product) -> "Product already exists"
+                else -> null
             }
+            message?.let { channel.send(it) }
         }
     }
 

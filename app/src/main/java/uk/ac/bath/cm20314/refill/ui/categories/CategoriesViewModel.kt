@@ -21,15 +21,13 @@ class CategoriesViewModel(
     val categories = repository.getCategories()
 
     fun createCategory(category: Category) {
-        if (category.categoryName.isBlank()) {
-            return
-        }
         viewModelScope.launch {
-            repository.createCategory(category).also { success ->
-                if (!success) {
-                    channel.send("Category already exists")
-                }
+            val message = when {
+                category.categoryName.isBlank() -> "Category must have a name"
+                !repository.createCategory(category) -> "Category already exists"
+                else -> null
             }
+            message?.let { channel.send(it) }
         }
     }
 

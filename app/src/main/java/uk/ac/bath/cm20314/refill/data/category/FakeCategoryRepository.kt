@@ -32,6 +32,9 @@ object FakeCategoryRepository : CategoryRepository {
     }
 
     override suspend fun createCategory(category: Category): Boolean {
+        if (data.value.any { it.categoryName == category.categoryName }) {
+            return false
+        }
         data.value = data.value.toMutableList().apply {
             add(category.copy(categoryId = UUID.randomUUID().toString()))
         }

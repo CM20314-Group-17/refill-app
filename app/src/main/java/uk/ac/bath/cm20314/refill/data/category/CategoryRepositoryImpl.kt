@@ -44,16 +44,12 @@ object CategoryRepositoryImpl : CategoryRepository {
         val categoryRef = reference.child(category.categoryId)
         val categories = getCategories().first()
 
-        if(categories.any{it.categoryName == category.categoryName}){
+        if (categories.any { it.categoryName == category.categoryName }) {
             return false
         }
+
         categoryRef.push().setValue(category)
         return true
-
-        //val categoryKey = reference.push().key
-        //val categoryRef = reference.child(categoryKey!!)
-        //categoryRef.setValue(category)
-        //reference.child(category.categoryName).setValue(true)
     }
 
     override fun deleteCategory(categoryId: String) {
