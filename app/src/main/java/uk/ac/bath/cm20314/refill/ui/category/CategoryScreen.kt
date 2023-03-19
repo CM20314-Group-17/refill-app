@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -126,7 +127,13 @@ private fun CategoryTopBar(
     var dropdownOpen by remember { mutableStateOf(false) }
 
     TopAppBar(
-        title = { Text(text = categoryName) },
+        title = {
+            Text(
+                text = categoryName,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+        },
         navigationIcon = {
             IconButton(onClick = { navigateBack() }) {
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
