@@ -31,10 +31,14 @@ class FakeCategoryRepository : CategoryRepository {
         }
     }
 
-    override fun createCategory(category: Category) {
+    override suspend fun createCategory(category: Category): Boolean {
+        if (data.value.any { it.categoryName == category.categoryName }) {
+            return false
+        }
         data.value = data.value.toMutableList().apply {
             add(category.copy(categoryId = UUID.randomUUID().toString()))
         }
+        return true
     }
 
     override fun deleteCategory(categoryId: String) {
