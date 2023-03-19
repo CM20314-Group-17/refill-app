@@ -3,6 +3,7 @@ package uk.ac.bath.cm20314.refill.data.category
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import uk.ac.bath.cm20314.refill.data.asFlow
 
 object CategoryRepositoryImpl : CategoryRepository {
@@ -39,11 +40,16 @@ object CategoryRepositoryImpl : CategoryRepository {
         categoryReference.child("thumbnail").setValue(category.thumbnail)
     }
 
-    override fun createCategory(category: Category) {
-        val categoryKey = reference.push().key
-        val categoryRef = reference.child(categoryKey!!)
-        categoryRef.setValue(category)
-        //reference.child(category.categoryName).setValue(true)
+    override suspend fun createCategory(category: Category): Boolean {
+        val categoryRef = reference.child(category.categoryId)
+        val categories = getCategories().first()
+
+        if (categories.any { it.categoryName == category.categoryName }) {
+            return false
+        }
+
+        categoryRef.push().setValue(category)
+        return true
     }
 
     override fun deleteCategory(categoryId: String) {

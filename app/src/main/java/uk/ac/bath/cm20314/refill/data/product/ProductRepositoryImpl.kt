@@ -2,6 +2,7 @@ package uk.ac.bath.cm20314.refill.data.product
 
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import uk.ac.bath.cm20314.refill.data.asFlow
 
@@ -46,12 +47,16 @@ object ProductRepositoryImpl : ProductRepository {
         reference.child(product.categoryId).child("products").child(product.productId).setValue(product)
     }
 
-    override fun createProduct(product: Product) {
-        val categoryRef = reference.child(product.categoryId)
-        val productKey = categoryRef.child("products").push().key
-        val productRef = categoryRef.child("products").child(productKey!!)
-        productRef.setValue(product)
-        //reference.child(product.categoryName).child(product.productName).setValue(product)
+    override suspend fun createProduct(product: Product): Boolean {
+        val productsRef = reference.child(product.categoryId).child("products")
+        val products = getProducts(product.categoryId).first()
+
+        if (products.any { it.productName == product.productName }) {
+            return false
+        }
+
+        productsRef.push().setValue(product)
+        return true
     }
 
     override fun deleteProduct(categoryId: String, productId: String) {

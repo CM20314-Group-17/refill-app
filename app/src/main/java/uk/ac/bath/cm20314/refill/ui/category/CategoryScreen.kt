@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.collectLatest
 import uk.ac.bath.cm20314.refill.R
 import uk.ac.bath.cm20314.refill.data.category.Category
 import uk.ac.bath.cm20314.refill.data.product.Product
@@ -39,6 +40,14 @@ fun CategoryScreen(
     var deleteDialogOpen by rememberSaveable { mutableStateOf(value = false) }
     var createDialogOpen by rememberSaveable { mutableStateOf(value = false) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.messages.collectLatest { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
     RefillLayout(
         topBar = { scrollBehaviour ->
             CategoryTopBar(
@@ -59,7 +68,8 @@ fun CategoryScreen(
                     contentDescription = stringResource(R.string.category_add)
                 )
             }
-        }
+        },
+        snackbarHostState = snackbarHostState
     ) {
         RefillList(items = products) { product ->
             RefillCard(
