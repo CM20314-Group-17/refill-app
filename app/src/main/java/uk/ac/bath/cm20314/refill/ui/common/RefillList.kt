@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -61,6 +63,7 @@ fun RefillCard(
     title: String,
     label: String,
     onClick: () -> Unit,
+    bubble: Boolean = false,
     preview: @Composable () -> Unit = {}
 ) {
     Card(
@@ -68,7 +71,17 @@ fun RefillCard(
         onClick = onClick
     ) {
         Column {
-            preview()
+            Box {
+                preview()
+                if (bubble) {
+                    Icon(
+                        imageVector = Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
+                    )
+                }
+            }
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 Text(
                     text = title,

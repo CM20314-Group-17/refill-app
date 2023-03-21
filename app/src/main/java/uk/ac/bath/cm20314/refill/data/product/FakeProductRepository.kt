@@ -34,7 +34,6 @@ object FakeProductRepository : ProductRepository {
     }
 
     override fun updateProduct(product: Product) {
-        product.isUpdated = false
         data.value = data.value.map {
             if (it.categoryId == product.categoryId && it.productId == product.productId) product else it
         }

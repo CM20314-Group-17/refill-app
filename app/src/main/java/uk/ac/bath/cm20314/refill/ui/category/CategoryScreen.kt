@@ -76,7 +76,8 @@ fun CategoryScreen(
             RefillCard(
                 title = product.productName,
                 label = stringResource(R.string.product_price, product.pricePerKg.toFloat() / 100),
-                onClick = { navigateToProduct(product) }
+                onClick = { navigateToProduct(product) },
+                bubble = !product.isUpdated
             ) {
                 Thumbnail(
                     thumbnail = product.thumbnail,

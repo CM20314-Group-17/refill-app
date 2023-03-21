@@ -17,6 +17,7 @@ class ProductViewModel(
     val product = productRepository.getProduct(categoryId, productId)
 
     fun updateProduct(product: Product) {
+        product.isUpdated = false
         productRepository.updateProduct(product)
     }
 

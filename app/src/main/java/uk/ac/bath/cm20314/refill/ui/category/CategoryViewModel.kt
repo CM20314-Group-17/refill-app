@@ -26,6 +26,7 @@ class CategoryViewModel(
     val products = productRepository.getProducts(categoryId)
 
     fun updateCategory(category: Category) {
+        category.isUpdated = false
         categoryRepository.updateCategory(category)
     }
 
