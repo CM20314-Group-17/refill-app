@@ -2,8 +2,8 @@ package uk.ac.bath.cm20314.refill.data.category
 
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import uk.ac.bath.cm20314.refill.data.asFlow
 
 object CategoryRepositoryImpl : CategoryRepository {
@@ -19,7 +19,7 @@ object CategoryRepositoryImpl : CategoryRepository {
                     itemCount = category.child("products").childrenCount.toInt(),
                     thumbnail = category.child("thumbnail").getValue(Int::class.java) ?: 0
                 )
-            }
+            }.sortedBy { it.categoryName.lowercase() }
         }
     }
 

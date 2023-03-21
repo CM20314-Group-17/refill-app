@@ -16,12 +16,14 @@ object FakeProductRepository : ProductRepository {
     )
 
     override fun getAllProducts(): Flow<List<Product>> {
-        return data
+        return data.map { products ->
+            products.sortedBy { it.productName.lowercase() }
+        }
     }
 
     override fun getProducts(categoryId: String): Flow<List<Product>> {
         return data.map { products ->
-            products.filter { it.categoryId == categoryId }
+            products.filter { it.categoryId == categoryId }.sortedBy { it.productName.lowercase() }
         }
     }
 

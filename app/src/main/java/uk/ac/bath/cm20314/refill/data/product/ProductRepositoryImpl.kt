@@ -19,7 +19,7 @@ object ProductRepositoryImpl : ProductRepository {
                         it.productId = product.key ?: return@mapNotNull null
                     }
                 }
-            }
+            }.sortedBy { it.productName.lowercase() }
         }
     }
 
@@ -30,7 +30,7 @@ object ProductRepositoryImpl : ProductRepository {
                     it.categoryId = categoryId
                     it.productId = child.key ?: return@mapNotNull null
                 }
-            }
+            }.sortedBy { it.productName.lowercase() }
         }
     }
 

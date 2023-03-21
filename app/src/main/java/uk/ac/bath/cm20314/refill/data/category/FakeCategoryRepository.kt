@@ -16,7 +16,9 @@ object FakeCategoryRepository : CategoryRepository {
     )
 
     override fun getCategories(): Flow<List<Category>> {
-        return data
+        return data.map { categories ->
+            categories.sortedBy { it.categoryName.lowercase() }
+        }
     }
 
     override fun getCategory(categoryId: String): Flow<Category?> {
