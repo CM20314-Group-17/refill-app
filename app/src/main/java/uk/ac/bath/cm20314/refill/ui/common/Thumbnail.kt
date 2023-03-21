@@ -38,7 +38,8 @@ private val thumbnails = listOf(
     R.drawable.thumbnail_pasta,
     R.drawable.thumbnail_rice,
     R.drawable.thumbnail_nuts,
-    R.drawable.thumbnail_fruit
+    R.drawable.thumbnail_fruit,
+    R.drawable.thumbnail_chocolate,
 )
 
 @Composable
