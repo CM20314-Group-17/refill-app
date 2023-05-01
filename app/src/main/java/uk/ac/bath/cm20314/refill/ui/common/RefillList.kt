@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -71,25 +72,30 @@ fun RefillCard(
         onClick = onClick
     ) {
         Column {
-            Box {
-                preview()
-                if (bubble) {
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer,
-                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
-                    )
-                }
-            }
+            preview()
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (bubble) {
+                        Text(
+                            text = "Changes Pending",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            maxLines = 1
+                        )
+                    }
+                }
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,

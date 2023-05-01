@@ -22,6 +22,8 @@ private val LightColours = lightColorScheme(
     surfaceVariant = Neutral80,
     onSurfaceVariant = Neutral50,
     outlineVariant = Neutral70,
+    tertiary = Salmon30,
+    onTertiary = Neutral90,
 )
 
 private val DarkColours = darkColorScheme(
@@ -36,6 +38,8 @@ private val DarkColours = darkColorScheme(
     surfaceVariant = Neutral20,
     onSurfaceVariant = Neutral80,
     outlineVariant = Neutral50,
+    tertiary = Salmon60,
+    onTertiary = Neutral10,
 )
 
 /** Displays the content using the app's theme. */

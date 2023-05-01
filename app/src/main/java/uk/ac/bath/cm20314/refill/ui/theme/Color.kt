@@ -13,3 +13,6 @@ val Neutral50 = Color(0xFF4D4D4B)
 val Neutral70 = Color(0xFF9A9A97)
 val Neutral80 = Color(0xFFC9C7CF)
 val Neutral90 = Color(0xFFDFDEE3)
+
+val Salmon30 = Color(0xFFC55C34)
+var Salmon60 = Color(0xFFF2A283)
